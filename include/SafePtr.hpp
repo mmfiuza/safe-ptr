@@ -60,9 +60,21 @@ class SafePtr // TODO: apply rule of five
         // copy assignment operator
         SafePtr& operator=(const SafePtr& other) {
             if (this != &other) {
-                delete[] this->begin_ptr;
-                this->begin_ptr = new T[other.size()];
-                std::copy(other.begin(), other.end(), this->begin_ptr);
+                delete[] this->ptr_begin;
+                this->ptr_begin = new T[other.size()];
+                std::copy(other.begin(), other.end(), this->ptr_begin);
+            }
+            return *this;
+        }
+
+        // move assignment operator
+        SafePtr& operator=(SafePtr&& other) noexcept {
+            if (this != &other) {
+                delete[] this->ptr_begin;
+                this->ptr_begin = other.ptr_begin;
+                this->ptr_end = other.ptr_end;
+                other.ptr_begin = nullptr; // TODO: rethink if this is needed
+                other.ptr_end = nullptr; // TODO: rethink if this is needed
             }
             return *this;
         }
