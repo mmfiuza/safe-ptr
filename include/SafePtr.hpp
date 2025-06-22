@@ -3,6 +3,7 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
 #if SAFE_PTR_DEBUG
     #include <unordered_map>
 #endif
@@ -14,8 +15,6 @@ class SafePtr
         // constructor
         SafePtr(const size_t& size) {
             this->ptr_begin = new T[size];
-            if (this->ptr_begin == nullptr)
-                std::cout << "\"new\" operator failed to allocate memory.\n";
             this->ptr_end = ptr_begin + size;
             #if SAFE_PTR_DEBUG
                 owner_count[ptr_begin] = 1;
@@ -96,6 +95,13 @@ class SafePtr
 
         T& operator[](const size_t& index) {
             return *(ptr_begin + index);
+        }
+
+        void print_all() const {
+            std::cout << "SafePtr::print_all():\n";
+            for (auto& t : *this) {
+                std::cout << "    " << t << "\n";
+            }
         }
 
     private:
