@@ -8,7 +8,7 @@
 #endif
 
 template<typename T>
-class SafePtr // TODO: apply rule of five
+class SafePtr
 {
     public:
         // constructor
@@ -36,13 +36,7 @@ class SafePtr // TODO: apply rule of five
         SafePtr(const SafePtr& other) {
             this->ptr_begin = new T[other.size()];
             this->ptr_end = this->ptr_begin + other.size();
-            for ( // TODO: use std::copy here
-                T *it_this=this->ptr_begin, *it_other=other.ptr_begin;
-                it_this != this->ptr_end;
-                ++it_this, ++it_other
-            ) {
-                *it_this = *it_other; // calls the copy assignment operator of each T
-            }
+            std::copy(other.begin(), other.end(), this->ptr_begin);
             #if SAFE_PTR_DEBUG
                 owner_count[this->ptr_begin] = 1;
                 is_deleted[ptr_begin] = false;
