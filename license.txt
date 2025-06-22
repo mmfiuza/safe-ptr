@@ -1,3 +1,8 @@
+Copyright (c) 2025 Matheus Machado Fiuza <matheusmachadofiuza@gmail.com>
+
+SafePtr is free software. You can redistribute it and/or modify it under the terms of the GNU Affero
+General Public License (AGPL), either version 3 or (at your option) any later version.
+
                     GNU AFFERO GENERAL PUBLIC LICENSE
                        Version 3, 19 November 2007
 
