@@ -5,6 +5,7 @@
 #define SAFE_PTR_DEBUG 1
 #define SAFE_PTR_NAMESPACE foo
 #define SAFE_PTR_DISABLE_BOUNDS_CHECKING
+#define SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
 #include "SafePtr.hpp"
 
 int main()

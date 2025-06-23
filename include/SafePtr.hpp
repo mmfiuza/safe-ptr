@@ -59,32 +59,40 @@ class SafePtr
 
         // copy assignment operator
         SafePtr& operator=(const SafePtr& other) {
-            if (this != &other) {
-                #if SAFE_PTR_DEBUG
-                    --_owner_count[this->_begin];
-                #endif
-                this->_begin = new T[other.size()];
-                std::copy(other.begin(), other.end(), this->_begin);
-                #if SAFE_PTR_DEBUG
-                    _owner_count[this->_begin] = 1;
-                    _is_deleted[this->_begin] = false;
-                #endif
-            }
+            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
+                if (this != &other) {
+            #endif
+                    #if SAFE_PTR_DEBUG
+                        --_owner_count[this->_begin];
+                    #endif
+                    this->_begin = new T[other.size()];
+                    std::copy(other.begin(), other.end(), this->_begin);
+                    #if SAFE_PTR_DEBUG
+                        _owner_count[this->_begin] = 1;
+                        _is_deleted[this->_begin] = false;
+                    #endif
+            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
+                }
+            #endif
             return *this;
         }
 
         // move assignment operator
         SafePtr& operator=(SafePtr&& other) noexcept {
-            if (this != &other) {
-                #if SAFE_PTR_DEBUG
-                    --_owner_count[this->_begin];
-                #endif
-                this->_begin = other._begin;
-                this->_end = other._end;
-                #if SAFE_PTR_DEBUG
-                    ++_owner_count[this->_begin];
-                #endif
-            }
+            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
+                if (this != &other) {
+            #endif
+                    #if SAFE_PTR_DEBUG
+                        --_owner_count[this->_begin];
+                    #endif
+                    this->_begin = other._begin;
+                    this->_end = other._end;
+                    #if SAFE_PTR_DEBUG
+                        ++_owner_count[this->_begin];
+                    #endif
+            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
+                }
+            #endif
             return *this;
         }
 
