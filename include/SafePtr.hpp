@@ -59,7 +59,7 @@ class SafePtr
 
         // copy assignment operator
         SafePtr& operator=(const SafePtr& other) {
-            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
+            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
                 if (this != &other) {
             #endif
                     #if SAFE_PTR_DEBUG
@@ -71,7 +71,7 @@ class SafePtr
                         _owner_count[this->_begin] = 1;
                         _is_deleted[this->_begin] = false;
                     #endif
-            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
+            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
                 }
             #endif
             return *this;
@@ -79,7 +79,7 @@ class SafePtr
 
         // move assignment operator
         SafePtr& operator=(SafePtr&& other) noexcept {
-            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
+            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
                 if (this != &other) {
             #endif
                     #if SAFE_PTR_DEBUG
@@ -90,7 +90,7 @@ class SafePtr
                     #if SAFE_PTR_DEBUG
                         ++_owner_count[this->_begin];
                     #endif
-            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECK
+            #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
                 }
             #endif
             return *this;
