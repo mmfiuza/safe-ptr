@@ -16,7 +16,7 @@ int main()
         s = 3;
     }
 
-    my_ptr.print_all();
+    my_ptr.print_all("my_ptr");
 
     std::cout << my_ptr[3] << "\n";
 

@@ -118,7 +118,7 @@ class SafePtr
             return _end;
         }
 
-        T& operator[](const size_t& index) {
+        T& operator[](const size_t& index) const {
             #ifndef SAFE_PTR_DISABLE_BOUNDS_CHECKING
                 if (index >= this->size()) {
                     throw std::out_of_range("tried to access SafePtr element out of range");
@@ -127,11 +127,17 @@ class SafePtr
             return *(_begin + index);
         }
 
-        void print_all() const {
-            std::cout << "SafePtr::print_all:\n";
-            for (auto& t : *this) {
-                std::cout << "    " << t << "\n";
+        T& operator[](const size_t& index) {
+            return const_cast<const SafePtr<T>&>(*this)[index];
+        }
+
+        void print_all(const char* const variable_name = "SafePtr::print_all") const {
+            std::cout << variable_name << ": {\n";
+            for (const auto& t : *this) {
+                std::cout << "    " << t << ",\n";
             }
+            std::cout << "\033[A" << "\033[2K"; // move one line above and clear it
+            std::cout << "    " << (*this)[this->size()-1] << "\n}\n";
         }
 
     private:
@@ -139,7 +145,7 @@ class SafePtr
         T* _end;   // points to the byte after the last byte of the element
 
         #if SAFE_PTR_DEBUG
-            static std::unordered_map<T*,bool> _is_deleted; // TODO: check if this is redundant
+            static std::unordered_map<T*,bool> _is_deleted;
             static std::unordered_map<T*,size_t> _owner_count;
 
             void _print_warning(const char* const msg) {
