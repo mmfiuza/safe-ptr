@@ -10,15 +10,16 @@
 
 int main()
 {
-    foo::SafePtr<int> my_ptr(5);
-
-    for (auto& s : my_ptr) {
-        s = 3;
+    foo::SafePtr<int> ptr1(5);
+    int i = 0;
+    for (auto& s : ptr1) {
+        s = i;
+        i += 2;
     }
+    ptr1.print_all();
+    ptr1.free();
 
-    my_ptr.print_all("my_ptr");
-
-    std::cout << my_ptr[3] << "\n";
-
-    my_ptr.free();
+    foo::SafePtr<float> ptr2 = {1.0, 1.2, 1.5, 1.7};
+    ptr2.print_all("second_ptr");
+    ptr2.free();
 }

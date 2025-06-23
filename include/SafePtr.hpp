@@ -27,6 +27,17 @@ public:
         #endif
     }
 
+    // constructor
+    SafePtr(const std::initializer_list<T>& il) {   
+        this->_begin = new T[il.size()];
+        this->_end = _begin + il.size();
+        std::copy(il.begin(), il.end(), this->_begin);
+        #if SAFE_PTR_DEBUG
+            _owner_count[this->_begin] = 1;
+            _is_deleted[this->_begin] = false;
+        #endif
+    }
+
     // destructor
     ~SafePtr() {
         #if SAFE_PTR_DEBUG
@@ -161,8 +172,10 @@ private:
 };
 
 #if SAFE_PTR_DEBUG
-    template<typename T> std::unordered_map<T*,bool> SafePtr<T>::_is_deleted;
-    template<typename T> std::unordered_map<T*,size_t> SafePtr<T>::_owner_count;
+    template<typename T>
+    std::unordered_map<T*,bool> SafePtr<T>::_is_deleted;
+    template<typename T>
+    std::unordered_map<T*,size_t> SafePtr<T>::_owner_count;
 #endif
 
 #ifdef SAFE_PTR_NAMESPACE
