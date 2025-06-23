@@ -4,8 +4,13 @@
 
 #include <iostream>
 #include <algorithm>
+#include <stdexcept>
 #if SAFE_PTR_DEBUG
     #include <unordered_map>
+#endif
+
+#ifdef SAFE_PTR_NAMESPACE
+    namespace SAFE_PTR_NAMESPACE {
 #endif
 
 template<typename T>
@@ -14,48 +19,56 @@ class SafePtr
     public:
         // constructor
         SafePtr(const size_t& size) {
-            this->ptr_begin = new T[size];
-            this->ptr_end = ptr_begin + size;
+            this->_begin = new T[size];
+            this->_end = _begin + size;
             #if SAFE_PTR_DEBUG
-                owner_count[ptr_begin] = 1;
-                is_deleted[ptr_begin] = false;
+                _owner_count[this->_begin] = 1;
+                _is_deleted[this->_begin] = false;
             #endif
         }
 
         // destructor
         ~SafePtr() {
             #if SAFE_PTR_DEBUG
-                --owner_count.at(ptr_begin);
-                if (owner_count.at(ptr_begin)==0 && !is_deleted.at(ptr_begin))
-                    log_system.warning("Memory was leaked.");
+                --_owner_count.at(_begin);
+                if (_owner_count.at(_begin)==0 && !_is_deleted.at(_begin)) {
+                    _print_warning("Memory was leaked.");
+                }
             #endif
         }
 
         // copy constructor
         SafePtr(const SafePtr& other) {
-            this->ptr_begin = new T[other.size()];
-            this->ptr_end = this->ptr_begin + other.size();
-            std::copy(other.begin(), other.end(), this->ptr_begin);
+            this->_begin = new T[other.size()];
+            this->_end = this->_begin + other.size();
+            std::copy(other.begin(), other.end(), this->_begin);
             #if SAFE_PTR_DEBUG
-                owner_count[this->ptr_begin] = 1;
-                is_deleted[ptr_begin] = false;
+                _owner_count[this->_begin] = 1;
+                _is_deleted[this->_begin] = false;
             #endif
         }
         
         // move constructor
         SafePtr(SafePtr&& other) noexcept {
-            this->ptr_begin = other.ptr_begin;
-            this->ptr_end = other.ptr_end;
-            other.ptr_begin = nullptr; // TODO: rethink if this is needed
-            other.ptr_end = nullptr; // TODO: rethink if this is needed
+            this->_begin = other._begin;
+            this->_end = other._end;
+            #if SAFE_PTR_DEBUG
+                ++_owner_count[this->_begin];
+            #endif
         }
 
         // copy assignment operator
         SafePtr& operator=(const SafePtr& other) {
             if (this != &other) {
-                delete[] this->ptr_begin;
-                this->ptr_begin = new T[other.size()];
-                std::copy(other.begin(), other.end(), this->ptr_begin);
+                #if SAFE_PTR_DEBUG
+                    --_owner_count[this->_begin];
+                #endif
+                this->_begin = new T[other.size()];
+                std::copy(other.begin(), other.end(), this->_begin);
+                #if SAFE_PTR_DEBUG
+                    _owner_count[this->_begin] = 1;
+                    _is_deleted[this->_begin] = false;
+                #endif
             }
             return *this;
         }
@@ -63,52 +76,70 @@ class SafePtr
         // move assignment operator
         SafePtr& operator=(SafePtr&& other) noexcept {
             if (this != &other) {
-                delete[] this->ptr_begin;
-                this->ptr_begin = other.ptr_begin;
-                this->ptr_end = other.ptr_end;
-                other.ptr_begin = nullptr; // TODO: rethink if this is needed
-                other.ptr_end = nullptr; // TODO: rethink if this is needed
+                #if SAFE_PTR_DEBUG
+                    --_owner_count[this->_begin];
+                #endif
+                this->_begin = other._begin;
+                this->_end = other._end;
+                #if SAFE_PTR_DEBUG
+                    ++_owner_count[this->_begin];
+                #endif
             }
             return *this;
         }
 
         void free() {
             #if SAFE_PTR_DEBUG
-                if(is_deleted.at(ptr_begin)==true)
-                    log_system.error("The same memory was freed twice.");
-                is_deleted.at(ptr_begin) = true;
+                if(_is_deleted.at(_begin) == true) {
+                    throw std::logic_error("the same memory pointer was freed twice");
+                }
+                _is_deleted.at(_begin) = true;
             #endif
-            delete[] ptr_begin;
+            delete[] _begin;
         }
 
         size_t size() const {
-            return ptr_end - ptr_begin;
+            return _end - _begin;
         }
 
         T* begin() const {
-            return ptr_begin;
+            return _begin;
         }
 
         T* end() const {
-            return ptr_end;
+            return _end;
         }
 
         T& operator[](const size_t& index) {
-            return *(ptr_begin + index);
+            return *(_begin + index);
         }
 
         void print_all() const {
-            std::cout << "SafePtr::print_all():\n";
+            std::cout << "SafePtr::print_all:\n";
             for (auto& t : *this) {
                 std::cout << "    " << t << "\n";
             }
         }
 
     private:
-        T* ptr_begin; // points to the first element
-        T* ptr_end;   // points to the byte after the last byte of the element
+        T* _begin; // points to the first element
+        T* _end;   // points to the byte after the last byte of the element
+
         #if SAFE_PTR_DEBUG
-            static std::unordered_map<T*,bool> is_deleted;
-            static std::unordered_map<T*,size_t> owner_count;
+            static std::unordered_map<T*,bool> _is_deleted; // TODO: check if this is redundant
+            static std::unordered_map<T*,size_t> _owner_count;
+
+            void _print_warning(const char* const msg) {
+                std::cerr << "\033[33m" << "SafePtr warning: " << "\033[0m" << msg << "\n";
+            }
         #endif
 };
+
+#if SAFE_PTR_DEBUG
+    template<typename T> std::unordered_map<T*,bool> SafePtr<T>::_is_deleted;
+    template<typename T> std::unordered_map<T*,size_t> SafePtr<T>::_owner_count;
+#endif
+
+#ifdef SAFE_PTR_NAMESPACE
+    }
+#endif
