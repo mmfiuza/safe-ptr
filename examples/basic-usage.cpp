@@ -22,4 +22,11 @@ int main()
     foo::SafePtr<float> ptr2 = {1.0, 1.2, 1.5, 1.7};
     ptr2.print_all("second_ptr");
     ptr2.free();
+
+    foo::SafePtr<float> ptr3(0);
+    std::cout << "ptr2.empty(): " << ptr2.empty() << "\n";
+    std::cout << "ptr3.empty(): " << ptr3.empty() << "\n";
+    ptr3.free();
+
+
 }

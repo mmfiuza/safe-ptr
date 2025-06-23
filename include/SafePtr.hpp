@@ -146,6 +146,10 @@ public:
         return const_cast<const SafePtr<T>&>(*this)[index];
     }
 
+    bool empty() const {
+        return this->size() == 0;
+    }
+
     void print_all(const char* const variable_name = "SafePtr::print_all") 
     const {
         std::cout << variable_name << ": {\n";
