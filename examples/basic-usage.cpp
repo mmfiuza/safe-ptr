@@ -4,7 +4,6 @@
 
 #define SAFE_PTR_DEBUG 1
 #define SAFE_PTR_NAMESPACE foo
-#define SAFE_PTR_DISABLE_BOUNDS_CHECKING
 #define SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
 #include "SafePtr.hpp"
 
@@ -18,14 +17,21 @@ int main()
     }
     ptr1.print_all();
     ptr1.free();
-
-    foo::SafePtr<float> ptr2 = {1.0, 1.2, 1.5, 1.7};
+    
+    const foo::SafePtr<float> ptr2 = {1.0, 1.2, 1.5, 1.7};
     ptr2.print_all("second_ptr");
-    ptr2.free();
-
+    
     foo::SafePtr<float> ptr3(0);
     std::cout << "ptr2.empty(): " << ptr2.empty() << "\n";
     std::cout << "ptr3.empty(): " << ptr3.empty() << "\n";
+
+    std::cout << "ptr2[2]: " << ptr2.at(2) << "\n";
+    try { ptr2.at(4); } catch (std::out_of_range e) {
+        std::cout << "Out of range!\n";
+    }
+    
+
+    ptr2.free();
     ptr3.free();
 
 

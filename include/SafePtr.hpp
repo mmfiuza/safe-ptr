@@ -107,7 +107,7 @@ public:
         return *this;
     }
 
-    void free() {
+    void free() const {
         #if SAFE_PTR_DEBUG
             if(_is_deleted.at(_begin) == true) {
                 throw std::logic_error(
@@ -132,18 +132,24 @@ public:
     }
 
     T& operator[](const size_t& index) const {
-        #ifndef SAFE_PTR_DISABLE_BOUNDS_CHECKING
-            if (index >= this->size()) {
-                throw std::out_of_range(
-                    "tried to access SafePtr element out of range"
-                );
-            }
-        #endif
         return *(_begin + index);
     }
 
     T& operator[](const size_t& index) {
         return const_cast<const SafePtr<T>&>(*this)[index];
+    }
+
+    T& at(const size_t& index) const {
+        if (index >= this->size()) {
+            throw std::out_of_range(
+                "tried to access SafePtr element out of range"
+            );
+        }
+        return *(_begin + index);
+    }
+
+    T& at(const size_t& index) {
+        return const_cast<const SafePtr<T>&>(*this).at(index);
     }
 
     bool empty() const {
