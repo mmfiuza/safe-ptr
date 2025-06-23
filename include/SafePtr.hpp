@@ -111,6 +111,11 @@ class SafePtr
         }
 
         T& operator[](const size_t& index) {
+            #ifndef SAFE_PTR_DISABLE_BOUNDS_CHECKING
+                if (index >= this->size()) {
+                    throw std::out_of_range("tried to access SafePtr element out of range");
+                }
+            #endif
             return *(_begin + index);
         }
 
