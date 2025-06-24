@@ -119,35 +119,35 @@ public:
         delete[] _begin;
     }
 
-    size_t size() const {
+    size_t size() const noexcept {
         return _end - _begin;
     }
 
-    const T* begin() const {
+    const T* begin() const noexcept {
         return _begin;
     }
 
-    T* begin() {
+    T* begin() noexcept {
         return const_cast<T*>(
             const_cast<const SafePtr<T>&>(*this).begin()
         );
     }
 
-    const T* end() const {
+    const T* end() const noexcept {
         return _end;
     }
 
-    T* end() {
+    T* end() noexcept {
         return const_cast<T*>(
             const_cast<const SafePtr<T>&>(*this).end()
         );
     }
 
-    const T& operator[](const size_t& index) const {
+    const T& operator[](const size_t& index) const noexcept {
         return *(_begin + index);
     }
 
-    T& operator[](const size_t& index) {
+    T& operator[](const size_t& index) noexcept {
         return const_cast<T&>(
             const_cast<const SafePtr<T>&>(*this)[index]
         );
@@ -168,35 +168,35 @@ public:
         );
     }
 
-    bool empty() const {
+    bool empty() const noexcept {
         return this->size() == 0;
     }
 
-    const T* data() const {
+    const T* data() const noexcept {
         return _begin;
     }
 
-    T* data() {
+    T* data() noexcept {
         return const_cast<T*>(
             const_cast<const SafePtr<T>&>(*this).data()
         );
     }
 
-    const T& front() const {
+    const T& front() const noexcept {
         return (*this)[0];
     }
 
-    T& front() {
-        return const_cast<T&>(
+    T& front() noexcept {
+        return const_cast<T&> (
             const_cast<const SafePtr<T>&>(*this).front()
         );
     }
 
-    const T& back() const {
+    const T& back() const noexcept {
         return (*this)[this->size()-1];
     }
 
-    T& back() {
+    T& back() noexcept {
         return const_cast<T&>(
             const_cast<const SafePtr<T>&>(*this).back()
         );

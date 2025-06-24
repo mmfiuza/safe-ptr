@@ -17,10 +17,13 @@ int main()
     }
     const foo::SafePtr<float> ptr2 = {1.0, 1.2, 1.5};
     foo::SafePtr<float> ptr3(0);
+    foo::SafePtr<int> ptr4(5);
+    ptr4.fill(9);
     
     ptr1.print_all();
     ptr2.print_all("second_ptr");
     ptr3.print_all("ptr3");
+    ptr4.print_all("ptr4");
 
     std::cout << "ptr1.begin(): " << ptr1.begin() << "\n";
     std::cout << "ptr2.begin(): " << ptr2.begin() << "\n";
@@ -52,10 +55,11 @@ int main()
     std::cout << "ptr1.at(1): " << ptr1.at(1) << "\n";
     std::cout << "ptr2.at(2): " << ptr2.at(2) << "\n";
     try { ptr2.at(3); } catch (std::out_of_range e) {
-        std::cout << "Out of range!\n";
+        std::cout << "ptr2.at(3): out of range!\n";
     }
     
     ptr1.free();
     ptr2.free();
     ptr3.free();
+    ptr4.free();
 }
