@@ -202,6 +202,12 @@ public:
         );
     }
 
+    void fill(const T& value) noexcept {
+        for (auto& p : *this) {
+            p = value;
+        }
+    }
+
     void print_all(const char* const variable_name = "SafePtr::print_all") 
     const {
         std::cout << variable_name << ": {\n";
