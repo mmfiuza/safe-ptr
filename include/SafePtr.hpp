@@ -202,7 +202,7 @@ public:
         );
     }
 
-    void fill(const T& value) noexcept {
+    void fill(const T& value) {
         for (auto& p : *this) {
             p = value;
         }
