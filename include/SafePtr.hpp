@@ -22,7 +22,7 @@ public:
         this->_begin = new T[size];
         this->_end = _begin + size;
         #if SAFE_PTR_DEBUG
-            _owner_count[this->_begin] = 1;
+            _ref_count[this->_begin] = 1;
             _is_deleted[this->_begin] = false;
         #endif
     }
@@ -33,7 +33,7 @@ public:
         this->_end = _begin + il.size();
         std::copy(il.begin(), il.end(), this->_begin);
         #if SAFE_PTR_DEBUG
-            _owner_count[this->_begin] = 1;
+            _ref_count[this->_begin] = 1;
             _is_deleted[this->_begin] = false;
         #endif
     }
@@ -41,12 +41,12 @@ public:
     // destructor
     ~SafePtr() {
         #if SAFE_PTR_DEBUG
-            --_owner_count.at(_begin);
-            if (_owner_count.at(_begin) == 0) {
+            --_ref_count.at(_begin);
+            if (_ref_count.at(_begin) == 0) {
                 if(!_is_deleted.at(_begin)) {
                     _print_warning("Memory was leaked.");
                 }
-                _owner_count.erase(_begin);
+                _ref_count.erase(_begin);
                 _is_deleted.erase(_begin);
             }
         #endif
@@ -58,7 +58,7 @@ public:
         this->_end = this->_begin + other.size();
         std::copy(other.begin(), other.end(), this->_begin);
         #if SAFE_PTR_DEBUG
-            _owner_count[this->_begin] = 1;
+            _ref_count[this->_begin] = 1;
             _is_deleted[this->_begin] = false;
         #endif
     }
@@ -72,7 +72,7 @@ public:
         this->_begin = other._begin;
         this->_end = other._end;
         #if SAFE_PTR_DEBUG
-            ++_owner_count.at(this->_begin);
+            ++_ref_count.at(this->_begin);
         #endif
     }
 
@@ -82,12 +82,12 @@ public:
             if (this != &other) {
         #endif
                 #if SAFE_PTR_DEBUG
-                    --_owner_count.at(this->_begin);
+                    --_ref_count.at(this->_begin);
                 #endif
                 this->_begin = new T[other.size()];
                 std::copy(other.begin(), other.end(), this->_begin);
                 #if SAFE_PTR_DEBUG
-                    _owner_count[this->_begin] = 1;
+                    _ref_count[this->_begin] = 1;
                     _is_deleted[this->_begin] = false;
                 #endif
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
@@ -106,12 +106,12 @@ public:
             if (this != &other) {
         #endif
                 #if SAFE_PTR_DEBUG
-                    --_owner_count[this->_begin];
+                    --_ref_count[this->_begin];
                 #endif
                 this->_begin = other._begin;
                 this->_end = other._end;
                 #if SAFE_PTR_DEBUG
-                    ++_owner_count[this->_begin];
+                    ++_ref_count[this->_begin];
                 #endif
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             }
@@ -239,7 +239,7 @@ private:
 
     #if SAFE_PTR_DEBUG
         static std::unordered_map<T*,bool> _is_deleted;
-        static std::unordered_map<T*,size_t> _owner_count;
+        static std::unordered_map<T*,size_t> _ref_count;
 
         void _print_warning(const char* const msg) {
             std::cerr << "\033[33m" << "SafePtr warning: " << "\033[0m"
@@ -252,7 +252,7 @@ private:
     template<typename T>
     std::unordered_map<T*,bool> SafePtr<T>::_is_deleted;
     template<typename T>
-    std::unordered_map<T*,size_t> SafePtr<T>::_owner_count;
+    std::unordered_map<T*,size_t> SafePtr<T>::_ref_count;
 #endif
 
 #ifdef SAFE_PTR_NAMESPACE
