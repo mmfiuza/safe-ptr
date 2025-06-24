@@ -60,7 +60,11 @@ public:
     }
     
     // move constructor
-    SafePtr(SafePtr&& other) noexcept {
+    SafePtr(SafePtr&& other)
+    #if !SAFE_PTR_DEBUG
+        noexcept
+    #endif
+    {
         this->_begin = other._begin;
         this->_end = other._end;
         #if SAFE_PTR_DEBUG
@@ -89,7 +93,11 @@ public:
     }
 
     // move assignment operator
-    SafePtr& operator=(SafePtr&& other) noexcept {
+    SafePtr& operator=(SafePtr&& other)
+    #if !SAFE_PTR_DEBUG
+        noexcept
+    #endif
+    {
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             if (this != &other) {
         #endif
