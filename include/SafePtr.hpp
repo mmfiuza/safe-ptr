@@ -123,23 +123,37 @@ public:
         return _end - _begin;
     }
 
-    T* begin() const {
+    const T* begin() const {
         return _begin;
     }
 
-    T* end() const {
+    T* begin() {
+        return const_cast<T*>(
+            const_cast<const SafePtr<T>&>(*this).begin()
+        );
+    }
+
+    const T* end() const {
         return _end;
     }
 
-    T& operator[](const size_t& index) const {
+    T* end() {
+        return const_cast<T*>(
+            const_cast<const SafePtr<T>&>(*this).end()
+        );
+    }
+
+    const T& operator[](const size_t& index) const {
         return *(_begin + index);
     }
 
     T& operator[](const size_t& index) {
-        return const_cast<const SafePtr<T>&>(*this)[index];
+        return const_cast<T&>(
+            const_cast<const SafePtr<T>&>(*this)[index]
+        );
     }
 
-    T& at(const size_t& index) const {
+    const T& at(const size_t& index) const {
         if (index >= this->size()) {
             throw std::out_of_range(
                 "tried to access SafePtr element out of range"
@@ -149,21 +163,56 @@ public:
     }
 
     T& at(const size_t& index) {
-        return const_cast<const SafePtr<T>&>(*this).at(index);
+        return const_cast<T&>(
+            const_cast<const SafePtr<T>&>(*this).at(index)
+        );
     }
 
     bool empty() const {
         return this->size() == 0;
     }
 
+    const T* data() const {
+        return _begin;
+    }
+
+    T* data() {
+        return const_cast<T*>(
+            const_cast<const SafePtr<T>&>(*this).data()
+        );
+    }
+
+    const T& front() const {
+        return (*this)[0];
+    }
+
+    T& front() {
+        return const_cast<T&>(
+            const_cast<const SafePtr<T>&>(*this).front()
+        );
+    }
+
+    const T& back() const {
+        return (*this)[this->size()-1];
+    }
+
+    T& back() {
+        return const_cast<T&>(
+            const_cast<const SafePtr<T>&>(*this).back()
+        );
+    }
+
     void print_all(const char* const variable_name = "SafePtr::print_all") 
     const {
         std::cout << variable_name << ": {\n";
-        for (const auto& t : *this) {
-            std::cout << "    " << t << ",\n";
+        if (!this->empty()) {
+            for (const auto& t : *this) {
+                std::cout << "    " << t << ",\n";
+            }
+            std::cout << "\033[A" << "\033[2K"; // move to line above and clear
+            std::cout << "    " << this->back() << "\n";
         }
-        std::cout << "\033[A" << "\033[2K"; // move one line above and clear it
-        std::cout << "    " << (*this)[this->size()-1] << "\n}\n";
+        std::cout << "}\n";
     }
 
 private:
