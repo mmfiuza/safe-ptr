@@ -42,8 +42,12 @@ public:
     ~SafePtr() {
         #if SAFE_PTR_DEBUG
             --_owner_count.at(_begin);
-            if (_owner_count.at(_begin)==0 && !_is_deleted.at(_begin)) {
-                _print_warning("Memory was leaked.");
+            if (_owner_count.at(_begin) == 0) {
+                if(!_is_deleted.at(_begin)) {
+                    _print_warning("Memory was leaked.");
+                }
+                _owner_count.erase(_begin);
+                _is_deleted.erase(_begin);
             }
         #endif
     }
@@ -68,7 +72,7 @@ public:
         this->_begin = other._begin;
         this->_end = other._end;
         #if SAFE_PTR_DEBUG
-            ++_owner_count[this->_begin];
+            ++_owner_count.at(this->_begin);
         #endif
     }
 
@@ -78,7 +82,7 @@ public:
             if (this != &other) {
         #endif
                 #if SAFE_PTR_DEBUG
-                    --_owner_count[this->_begin];
+                    --_owner_count.at(this->_begin);
                 #endif
                 this->_begin = new T[other.size()];
                 std::copy(other.begin(), other.end(), this->_begin);
