@@ -19,7 +19,9 @@ void test_methods()
     ASSERT_EQ(ptr1.at(1), 3);
     ASSERT_EQ(ptr1.at(2), 2);
     ASSERT_EQ(ptr1.at(3), 1);
-    ASSERT_THROWS(ptr1.at(4));
+    #if SAFE_PTR_DEBUG
+        ASSERT_THROWS(ptr1.at(4));
+    #endif
     ASSERT_EQ(ptr0.empty(), true);
     ASSERT_EQ(ptr1.empty(), false);
     ASSERT_EQ(ptr1.data(), ptr1.begin());
@@ -48,7 +50,9 @@ void test_methods()
     ASSERT_EQ(ptr3.at(1), 3);
     ASSERT_EQ(ptr3.at(2), 2);
     ASSERT_EQ(ptr3.at(3), 1);
-    ASSERT_THROWS(ptr3.at(4));
+    #if SAFE_PTR_DEBUG
+        ASSERT_THROWS(ptr3.at(4));
+    #endif
     ASSERT_EQ(ptr2.empty(), true);
     ASSERT_EQ(ptr3.empty(), false);
     ASSERT_EQ(ptr3.data(), ptr3.begin());

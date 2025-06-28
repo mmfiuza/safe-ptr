@@ -2,28 +2,33 @@
 
 # pragma once
 
+#define COLOR_RED "\033[31m"
+#define COLOR_RESET "\033[0m"
+
 #define ASSERT_TRUE(expr) \
     if (!(expr)) { \
-        std::cerr << "FAIL: " << #expr << " (line " << __LINE__ << ")\n"; \
+        std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
+            #expr << " (line " << __LINE__ << ")\n"; \
     }
  
 #define ASSERT_EQ(a, b) \
     if ((a) != (b)) { \
-        std::cerr << "FAIL: " << #a << " != " << #b << \
-            " (line " << __LINE__ << ")\n"; \
-        std::cerr << "  " << (a) << " vs " << (b) << "\n"; \
+        std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
+            #a << " != " << #b << " (line " << __LINE__ << ")\n" << \
+            "    " << (a) << " vs " << (b) << "\n"; \
     }
 
 #define ASSERT_DIFF(a, b) \
     if ((a) == (b)) { \
-        std::cerr << "FAIL: " << #a << " = " << #b << \
-            " (line " << __LINE__ << ")\n"; \
-        std::cerr << "  " << (a) << " vs " << (b) << "\n"; \
+        std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
+            #a << " = " << #b << " (line " << __LINE__ << ")\n" << \
+            "    " << (a) << " vs " << (b) << "\n"; \
     }
 
 #define ASSERT_THROWS(expr) \
     try { \
         expr; \
-        std::cerr << "FAIL: No exception thrown (line " << __LINE__ << ")\n"; \
+        std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
+            "No exception thrown (line " << __LINE__ << ")\n"; \
     } catch (...) { \
     }

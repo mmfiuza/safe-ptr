@@ -6,7 +6,7 @@
 
 void test_print()
 {
-    std::cout << "========== PRINT TEST BEGIN ==========\n";
+    std::cout << "\033[34m========== PRINT TEST BEGIN ==========\033[0m\n";
 
     // empty
     SafePtr<int> ptr0(0);
@@ -27,5 +27,5 @@ void test_print()
     ptr1.free();
     ptr2.free();
 
-    std::cout << "========== PRINT TEST END ==========\n";
+    std::cout << "\033[34m========== PRINT TEST END ==========\033[0m\n";
 }

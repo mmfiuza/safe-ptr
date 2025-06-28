@@ -69,9 +69,13 @@ void test_rule_of_5()
     ptr2.free();
     ptr3.free();
     ptr4.free();
-    ASSERT_THROWS(ptr5.free());
+    #if SAFE_PTR_DEBUG
+        ASSERT_THROWS(ptr5.free());
+    #endif
     ptr6.free();
     ptr7.free();
     ptr8.free();
-    ASSERT_THROWS(ptr9.free());
+    #if SAFE_PTR_DEBUG
+        ASSERT_THROWS(ptr9.free());
+    #endif
 }
