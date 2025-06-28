@@ -195,7 +195,7 @@ public:
 
     T& at(const size_t& index) {
         return const_cast<T&>(
-            const_cast<const SafePtr<T>&>(*this)[index]
+            const_cast<const SafePtr<T>&>(*this).at(index)
         );
     }
 
