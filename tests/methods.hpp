@@ -60,7 +60,7 @@ void test_methods()
     ASSERT_EQ(ptr3.back(), ptr3[3]);
     ASSERT_EQ(ptr3.end(), ptr3.begin() + ptr3.size());
     int x;
-    for (auto& p : ptr3) {
+    for (const auto& p : ptr3) {
         x = p;
     }
 
