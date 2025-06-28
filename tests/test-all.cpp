@@ -4,9 +4,11 @@
 #include "SafePtr.hpp"
 #include "rule-of-5.hpp"
 #include "methods.hpp"
+#include "print.hpp"
 
 int main()
 {
     test_rule_of_5();
     test_methods();
+    test_print();
 }
