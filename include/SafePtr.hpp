@@ -7,6 +7,7 @@
 #include <stdexcept>
 #if SAFE_PTR_DEBUG
     #include <unordered_map>
+    #include <mutex>
 #endif
 
 #ifdef SAFE_PTR_NAMESPACE
@@ -19,36 +20,42 @@ class SafePtr
 public:
     // constructor
     SafePtr(const size_t& size) {
-        this->_begin = new T[size];
-        this->_end = _begin + size;
+        _begin = new T[size];
+        _end = _begin + size;
         #if SAFE_PTR_DEBUG
-            _ref_count[this->_begin] = 1;
-            _is_deleted[this->_begin] = false;
+            _mtx.lock();
+                _ref_count[_begin] = 1;
+                _is_deleted[_begin] = false;
+            _mtx.unlock();
         #endif
     }
 
     // constructor
     SafePtr(const std::initializer_list<T>& il) {   
-        this->_begin = new T[il.size()];
-        this->_end = _begin + il.size();
-        std::copy(il.begin(), il.end(), this->_begin);
+        _begin = new T[il.size()];
+        _end = _begin + il.size();
         #if SAFE_PTR_DEBUG
-            _ref_count[this->_begin] = 1;
-            _is_deleted[this->_begin] = false;
+            _mtx.lock();
+                _ref_count[_begin] = 1;
+                _is_deleted[_begin] = false;
+            _mtx.unlock();
         #endif
+        std::copy(il.begin(), il.end(), this->_begin);
     }
 
     // destructor
-    ~SafePtr() {
+    ~SafePtr() noexcept {
         #if SAFE_PTR_DEBUG
-            --_ref_count.at(_begin);
-            if (_ref_count.at(_begin) == 0) {
-                if(!_is_deleted.at(_begin)) {
-                    _print_warning("Memory was leaked.");
+            _mtx.lock();
+            --_get_ref_count_nocheck(_begin);
+            if (_get_ref_count_nocheck(_begin) == 0) {
+                if(!_get_is_deleted_nocheck(_begin)) {
+                    _warning("Memory was leaked.");
                 }
                 _ref_count.erase(_begin);
                 _is_deleted.erase(_begin);
             }
+            _mtx.unlock();
         #endif
     }
 
@@ -56,11 +63,13 @@ public:
     SafePtr(const SafePtr& other) {
         this->_begin = new T[other.size()];
         this->_end = this->_begin + other.size();
-        std::copy(other.begin(), other.end(), this->_begin);
         #if SAFE_PTR_DEBUG
-            _ref_count[this->_begin] = 1;
-            _is_deleted[this->_begin] = false;
+            _mtx.lock();
+                _ref_count[this->_begin] = 1;
+                _is_deleted[this->_begin] = false;
+            _mtx.unlock();
         #endif
+        std::copy(other.begin(), other.end(), this->_begin);
     }
     
     // move constructor
@@ -72,7 +81,9 @@ public:
         this->_begin = other._begin;
         this->_end = other._end;
         #if SAFE_PTR_DEBUG
-            ++_ref_count.at(this->_begin);
+            _mtx.lock();
+                ++_get_ref_count_nocheck(this->_begin);
+            _mtx.unlock();
         #endif
     }
 
@@ -81,15 +92,18 @@ public:
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             if (this != &other) {
         #endif
-                #if SAFE_PTR_DEBUG
-                    --_ref_count.at(this->_begin);
-                #endif
-                this->_begin = new T[other.size()];
-                std::copy(other.begin(), other.end(), this->_begin);
-                #if SAFE_PTR_DEBUG
-                    _ref_count[this->_begin] = 1;
-                    _is_deleted[this->_begin] = false;
-                #endif
+            #if SAFE_PTR_DEBUG
+                _mtx.lock();
+                --_get_ref_count_nocheck(this->_begin);
+            #endif
+            this->_begin = new T[other.size()];
+            this->_end = this->_begin + other.size();
+            #if SAFE_PTR_DEBUG
+                _ref_count[this->_begin] = 1;
+                _is_deleted[this->_begin] = false;
+                _mtx.unlock();
+            #endif
+            std::copy(other.begin(), other.end(), this->_begin);
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             }
         #endif
@@ -105,14 +119,16 @@ public:
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             if (this != &other) {
         #endif
-                #if SAFE_PTR_DEBUG
-                    --_ref_count[this->_begin];
-                #endif
-                this->_begin = other._begin;
-                this->_end = other._end;
-                #if SAFE_PTR_DEBUG
-                    ++_ref_count[this->_begin];
-                #endif
+            #if SAFE_PTR_DEBUG
+                _mtx.lock();
+                --_get_ref_count_nocheck(this->_begin);
+            #endif
+            this->_begin = other._begin;
+            this->_end = other._end;
+            #if SAFE_PTR_DEBUG
+                ++_get_ref_count_nocheck(this->_begin);
+                _mtx.unlock();
+            #endif
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             }
         #endif
@@ -121,12 +137,15 @@ public:
 
     void free() const {
         #if SAFE_PTR_DEBUG
-            if(_is_deleted.at(_begin) == true) {
+            _mtx.lock();
+            if(_get_is_deleted_nocheck(_begin) == true) {
+                _mtx.unlock(); // unlock before it throws
                 throw std::logic_error(
-                    "the same memory pointer was freed twice"
+                    "it was tried to free the same memory pointer twice"
                 );
             }
-            _is_deleted.at(_begin) = true;
+            _get_is_deleted_nocheck(_begin) = true;
+            _mtx.unlock();
         #endif
         delete[] _begin;
     }
@@ -176,7 +195,7 @@ public:
 
     T& at(const size_t& index) {
         return const_cast<T&>(
-            const_cast<const SafePtr<T>&>(*this).at(index)
+            const_cast<const SafePtr<T>&>(*this)[index]
         );
     }
 
@@ -195,7 +214,7 @@ public:
     }
 
     const T& front() const noexcept {
-        return (*this)[0];
+        return *(this->_begin);
     }
 
     T& front() noexcept {
@@ -205,7 +224,7 @@ public:
     }
 
     const T& back() const noexcept {
-        return (*this)[this->size()-1];
+        return *(this->_end-1);
     }
 
     T& back() noexcept {
@@ -238,21 +257,37 @@ private:
     T* _end;   // points to the byte after the last byte of the element
 
     #if SAFE_PTR_DEBUG
-        static std::unordered_map<T*,bool> _is_deleted;
-        static std::unordered_map<T*,size_t> _ref_count;
+        static std::unordered_map<const T*,size_t> _ref_count;
+        static std::unordered_map<const T*,bool> _is_deleted;
+        static std::mutex _mtx;
 
-        void _print_warning(const char* const msg) {
+        size_t& _get_ref_count_nocheck(const T* const ptr)
+        const noexcept {
+            auto it = _ref_count.find(ptr);
+            return it->second;
+        }
+
+        bool& _get_is_deleted_nocheck(const T* const ptr)
+        const noexcept {
+            auto it = _is_deleted.find(ptr);
+            return it->second;
+        }
+
+        void _warning(const char* const msg) const {
             std::cerr << "\033[33m" << "SafePtr warning: " << "\033[0m"
                 << msg << "\n";
         }
+
     #endif
 };
 
 #if SAFE_PTR_DEBUG
     template<typename T>
-    std::unordered_map<T*,bool> SafePtr<T>::_is_deleted;
+    std::unordered_map<const T*,size_t> SafePtr<T>::_ref_count;
     template<typename T>
-    std::unordered_map<T*,size_t> SafePtr<T>::_ref_count;
+    std::unordered_map<const T*,bool> SafePtr<T>::_is_deleted;
+    
+    template<typename T> std::mutex SafePtr<T>::_mtx;
 #endif
 
 #ifdef SAFE_PTR_NAMESPACE
