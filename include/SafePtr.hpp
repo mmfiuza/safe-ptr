@@ -258,11 +258,23 @@ private:
         static size_t _next_available_memory_id;
         static std::unordered_map<size_t,size_t> _ref_count;
         static std::unordered_map<size_t,bool> _is_deleted;
+        static bool _id_overflow_occurred;
         static std::mutex _mtx;
 
-        size_t& _get_new_memory_id() const noexcept {
+        static size_t& _get_new_memory_id() noexcept {
             ++_next_available_memory_id;
-            return _next_available_memory_id;
+            if (_next_available_memory_id == 0) {
+                _id_overflow_occurred = true;
+            }
+            if (!_id_overflow_occurred) {
+                return _next_available_memory_id;
+            }
+            while (true) { // handle overflow
+                if (!_ref_count.contains(_next_available_memory_id)) {
+                    return _next_available_memory_id;
+                }
+                ++_next_available_memory_id;
+            }
         }
 
         size_t& _get_ref_count_nothrow() const noexcept {
@@ -286,12 +298,13 @@ private:
 };
 
 #if SAFE_PTR_DEBUG
+    template<typename T> size_t SafePtr<T>::_next_available_memory_id = 0;
+
     template<typename T>
     std::unordered_map<size_t,size_t> SafePtr<T>::_ref_count;
     template<typename T>
     std::unordered_map<size_t,bool> SafePtr<T>::_is_deleted;
-
-    template<typename T> size_t SafePtr<T>::_next_available_memory_id = 0;
+    template<typename T> bool SafePtr<T>::_id_overflow_occurred = false;
     
     template<typename T> std::mutex SafePtr<T>::_mtx;
 #endif
