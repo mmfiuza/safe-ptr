@@ -48,7 +48,7 @@ public:
     }
 
     // destructor
-    ~SafePtr() noexcept {
+    ~SafePtr() noexcept(!SAFE_PTR_DEBUG) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
             --_get_ref_count_nocheck();
