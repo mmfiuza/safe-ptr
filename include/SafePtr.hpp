@@ -20,27 +20,29 @@ class SafePtr
 public:
     // constructor
     SafePtr(const size_t& size) {
+        #if SAFE_PTR_DEBUG
+            std::lock_guard<std::mutex> lock(_mtx);
+        #endif
         _begin = new T[size];
         _end = _begin + size;
         #if SAFE_PTR_DEBUG
-            _mtx.lock();
-                _memory_id = _get_new_memory_id();
-                _ref_count[_memory_id] = 1;
-                _is_deleted[_memory_id] = false;
-            _mtx.unlock();
+            _memory_id = _get_new_memory_id();
+            _ref_count[_memory_id] = 1;
+            _is_deleted[_memory_id] = false;
         #endif
     }
 
     // constructor
-    SafePtr(const std::initializer_list<T>& il) {   
+    SafePtr(const std::initializer_list<T>& il) {
+        #if SAFE_PTR_DEBUG
+            std::lock_guard<std::mutex> lock(_mtx);
+        #endif
         _begin = new T[il.size()];
         _end = _begin + il.size();
         #if SAFE_PTR_DEBUG
-            _mtx.lock();
-                _memory_id = _get_new_memory_id();
-                _ref_count[_memory_id] = 1;
-                _is_deleted[_memory_id] = false;
-            _mtx.unlock();
+            _memory_id = _get_new_memory_id();
+            _ref_count[_memory_id] = 1;
+            _is_deleted[_memory_id] = false;
         #endif
         std::copy(il.begin(), il.end(), this->_begin);
     }
@@ -48,7 +50,7 @@ public:
     // destructor
     ~SafePtr() noexcept {
         #if SAFE_PTR_DEBUG
-            _mtx.lock();
+            std::lock_guard<std::mutex> lock(_mtx);
             --_get_ref_count_nocheck(_memory_id);
             if (_get_ref_count_nocheck(_memory_id) == 0) {
                 if(!_get_is_deleted_nocheck(_memory_id)) {
@@ -57,20 +59,20 @@ public:
                 _ref_count.erase(_memory_id);
                 _is_deleted.erase(_memory_id);
             }
-            _mtx.unlock();
         #endif
     }
 
     // copy constructor
     SafePtr(const SafePtr& other) {
+        #if SAFE_PTR_DEBUG
+            std::lock_guard<std::mutex> lock(_mtx);
+        #endif
         this->_begin = new T[other.size()];
         this->_end = this->_begin + other.size();
         #if SAFE_PTR_DEBUG
-            _mtx.lock();
-                this->_memory_id = _get_new_memory_id();
-                _ref_count[this->_memory_id] = 1;
-                _is_deleted[this->_memory_id] = false;
-            _mtx.unlock();
+            this->_memory_id = _get_new_memory_id();
+            _ref_count[this->_memory_id] = 1;
+            _is_deleted[this->_memory_id] = false;
         #endif
         std::copy(other.begin(), other.end(), this->_begin);
     }
@@ -82,14 +84,13 @@ public:
     #endif
     {
         #if SAFE_PTR_DEBUG
-            _mtx.lock();
+            std::lock_guard<std::mutex> lock(_mtx);
         #endif
         this->_begin = other._begin;
         this->_end = other._end;
         #if SAFE_PTR_DEBUG
             this->_memory_id = other._memory_id;
             ++_get_ref_count_nocheck(this->_memory_id);
-            _mtx.unlock();
         #endif
     }
 
@@ -99,7 +100,7 @@ public:
             if (this != &other) {
         #endif
             #if SAFE_PTR_DEBUG
-                _mtx.lock();
+                std::lock_guard<std::mutex> lock(_mtx);
                 --_get_ref_count_nocheck(this->_memory_id);
             #endif
             this->_begin = new T[other.size()];
@@ -108,7 +109,6 @@ public:
                 this->_memory_id = _get_new_memory_id();
                 _ref_count[this->_memory_id] = 1;
                 _is_deleted[this->_memory_id] = false;
-                _mtx.unlock();
             #endif
             std::copy(other.begin(), other.end(), this->_begin);
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
@@ -127,7 +127,7 @@ public:
             if (this != &other) {
         #endif
             #if SAFE_PTR_DEBUG
-                _mtx.lock();
+                std::lock_guard<std::mutex> lock(_mtx);
                 --_get_ref_count_nocheck(this->_memory_id);
             #endif
             this->_begin = other._begin;
@@ -135,7 +135,6 @@ public:
             #if SAFE_PTR_DEBUG
                 this->_memory_id = other._memory_id;
                 ++_get_ref_count_nocheck(this->_memory_id);
-                _mtx.unlock();
             #endif
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             }
@@ -145,9 +144,8 @@ public:
 
     void free() const {
         #if SAFE_PTR_DEBUG
-            _mtx.lock();
+            std::lock_guard<std::mutex> lock(_mtx);
             if(_get_is_deleted_nocheck(_memory_id) == true) {
-                _mtx.unlock(); // unlock before it throws
                 throw std::logic_error(
                     "it was tried to free the same memory pointer twice"
                 );
@@ -155,9 +153,6 @@ public:
             _get_is_deleted_nocheck(_memory_id) = true;
         #endif
         delete[] _begin;
-        #if SAFE_PTR_DEBUG
-            _mtx.unlock();
-        #endif
     }
 
     size_t size() const noexcept {
