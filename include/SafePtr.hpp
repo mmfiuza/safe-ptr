@@ -51,9 +51,9 @@ public:
     ~SafePtr() noexcept {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
-            --_get_ref_count_nocheck(_memory_id);
-            if (_get_ref_count_nocheck(_memory_id) == 0) {
-                if(!_get_is_deleted_nocheck(_memory_id)) {
+            --_get_ref_count_nocheck();
+            if (_get_ref_count_nocheck() == 0) {
+                if(!_get_is_deleted_nocheck()) {
                     _warning("Memory was leaked.");
                 }
                 _ref_count.erase(_memory_id);
@@ -90,7 +90,7 @@ public:
         this->_end = other._end;
         #if SAFE_PTR_DEBUG
             this->_memory_id = other._memory_id;
-            ++_get_ref_count_nocheck(this->_memory_id);
+            ++_get_ref_count_nocheck();
         #endif
     }
 
@@ -101,7 +101,7 @@ public:
         #endif
             #if SAFE_PTR_DEBUG
                 std::lock_guard<std::mutex> lock(_mtx);
-                --_get_ref_count_nocheck(this->_memory_id);
+                --_get_ref_count_nocheck();
             #endif
             this->_begin = new T[other.size()];
             this->_end = this->_begin + other.size();
@@ -128,13 +128,13 @@ public:
         #endif
             #if SAFE_PTR_DEBUG
                 std::lock_guard<std::mutex> lock(_mtx);
-                --_get_ref_count_nocheck(this->_memory_id);
+                --_get_ref_count_nocheck();
             #endif
             this->_begin = other._begin;
             this->_end = other._end;
             #if SAFE_PTR_DEBUG
                 this->_memory_id = other._memory_id;
-                ++_get_ref_count_nocheck(this->_memory_id);
+                ++_get_ref_count_nocheck();
             #endif
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             }
@@ -145,12 +145,12 @@ public:
     void free() const {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
-            if(_get_is_deleted_nocheck(_memory_id) == true) {
+            if(_get_is_deleted_nocheck() == true) {
                 throw std::logic_error(
                     "it was tried to free the same memory pointer twice"
                 );
             }
-            _get_is_deleted_nocheck(_memory_id) = true;
+            _get_is_deleted_nocheck() = true;
         #endif
         delete[] _begin;
     }
@@ -273,17 +273,17 @@ private:
             return _next_available_memory_id;
         }
 
-        size_t& _get_ref_count_nocheck(const size_t& id)
+        size_t& _get_ref_count_nocheck()
         const noexcept {
             typename std::unordered_map<size_t,size_t>::iterator it = 
-                _ref_count.find(id);
+                _ref_count.find(_memory_id);
             return it->second;
         }
 
-        bool& _get_is_deleted_nocheck(const size_t& id)
+        bool& _get_is_deleted_nocheck()
         const noexcept {
             typename std::unordered_map<size_t,bool>::iterator it =
-                _is_deleted.find(id);
+                _is_deleted.find(_memory_id);
             return it->second;
         }
 
