@@ -78,11 +78,7 @@ public:
     }
     
     // move constructor
-    SafePtr(SafePtr&& other)
-    #if !SAFE_PTR_DEBUG
-        noexcept
-    #endif
-    {
+    SafePtr(SafePtr&& other) noexcept(!SAFE_PTR_DEBUG) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
         #endif
@@ -118,11 +114,7 @@ public:
     }
 
     // move assignment operator
-    SafePtr& operator=(SafePtr&& other)
-    #if !SAFE_PTR_DEBUG
-        noexcept
-    #endif
-    {
+    SafePtr& operator=(SafePtr&& other) noexcept(!SAFE_PTR_DEBUG) {
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             if (this != &other) {
         #endif
