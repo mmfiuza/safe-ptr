@@ -78,11 +78,13 @@ public:
         noexcept
     #endif
     {
+        #if SAFE_PTR_DEBUG
+            _mtx.lock();
+        #endif
         this->_begin = other._begin;
         this->_end = other._end;
         #if SAFE_PTR_DEBUG
-            _mtx.lock();
-                ++_get_ref_count_nocheck(this->_begin);
+            ++_get_ref_count_nocheck(this->_begin);
             _mtx.unlock();
         #endif
     }
@@ -145,9 +147,11 @@ public:
                 );
             }
             _get_is_deleted_nocheck(_begin) = true;
-            _mtx.unlock();
         #endif
         delete[] _begin;
+        #if SAFE_PTR_DEBUG
+            _mtx.unlock();
+        #endif
     }
 
     size_t size() const noexcept {
@@ -263,13 +267,15 @@ private:
 
         size_t& _get_ref_count_nocheck(const T* const ptr)
         const noexcept {
-            auto it = _ref_count.find(ptr);
+            typename std::unordered_map<const T*,size_t>::iterator it = 
+                _ref_count.find(ptr);
             return it->second;
         }
 
         bool& _get_is_deleted_nocheck(const T* const ptr)
         const noexcept {
-            auto it = _is_deleted.find(ptr);
+            typename std::unordered_map<const T*,bool>::iterator it =
+                _is_deleted.find(ptr);
             return it->second;
         }
 
