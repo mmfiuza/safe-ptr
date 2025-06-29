@@ -66,6 +66,7 @@ public:
     SafePtr(const SafePtr& other) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
+            other._check_for_usage_after_free();
         #endif
         this->_begin = new T[other.size()];
         this->_end = this->_begin + other.size();
@@ -81,6 +82,7 @@ public:
     SafePtr(SafePtr&& other) noexcept(!SAFE_PTR_DEBUG) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
+            other._check_for_usage_after_free();
         #endif
         this->_begin = other._begin;
         this->_end = other._end;
@@ -97,6 +99,8 @@ public:
         #endif
             #if SAFE_PTR_DEBUG
                 std::lock_guard<std::mutex> lock(_mtx);
+                this->_check_for_usage_after_free();
+                other._check_for_usage_after_free();
                 --_get_ref_count_nothrow();
             #endif
             this->_begin = new T[other.size()];
@@ -120,6 +124,8 @@ public:
         #endif
             #if SAFE_PTR_DEBUG
                 std::lock_guard<std::mutex> lock(_mtx);
+                this->_check_for_usage_after_free();
+                other._check_for_usage_after_free();
                 --_get_ref_count_nothrow();
             #endif
             this->_begin = other._begin;
@@ -148,10 +154,16 @@ public:
     }
 
     size_t size() const noexcept {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         return _end - _begin;
     }
 
     const T* begin() const noexcept {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         return _begin;
     }
 
@@ -162,6 +174,9 @@ public:
     }
 
     const T* end() const noexcept {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         return _end;
     }
 
@@ -172,6 +187,9 @@ public:
     }
 
     const T& operator[](const size_t& index) const noexcept {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         return *(_begin + index);
     }
 
@@ -182,6 +200,9 @@ public:
     }
 
     const T& at(const size_t& index) const {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         if (index >= this->size()) {
             throw std::out_of_range(
                 "tried to access SafePtr element out of range"
@@ -197,10 +218,16 @@ public:
     }
 
     bool empty() const noexcept {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         return this->size() == 0;
     }
 
     const T* data() const noexcept {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         return _begin;
     }
 
@@ -211,6 +238,9 @@ public:
     }
 
     const T& front() const noexcept {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         return *(this->_begin);
     }
 
@@ -221,6 +251,9 @@ public:
     }
 
     const T& back() const noexcept {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         return *(this->_end-1);
     }
 
@@ -231,6 +264,9 @@ public:
     }
 
     void fill(const T& value) {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         for (auto& p : *this) {
             p = value;
         }
@@ -238,6 +274,9 @@ public:
 
     void print_all(const char* const variable_name = "SafePtr::print_all") 
     const {
+        #if SAFE_PTR_DEBUG
+            _check_for_usage_after_free();
+        #endif
         std::cout << variable_name << ": {\n";
         if (!this->empty()) {
             for (const auto& t : *this) {
@@ -274,6 +313,12 @@ private:
                     return _next_available_memory_id;
                 }
                 ++_next_available_memory_id;
+            }
+        }
+
+        void _check_for_usage_after_free() const noexcept {
+            if (_get_is_deleted_nothrow() == true) {
+                _warning("Tried to access data after free() was called.");
             }
         }
 
