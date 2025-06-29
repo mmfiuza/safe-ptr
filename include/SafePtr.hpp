@@ -134,7 +134,7 @@ public:
         return *this;
     }
 
-    void free() const {
+    void free() const noexcept(!SAFE_PTR_DEBUG) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
             if(_get_is_deleted_nothrow() == true) {
@@ -265,23 +265,21 @@ private:
             return _next_available_memory_id;
         }
 
-        size_t& _get_ref_count_nothrow()
-        const noexcept {
+        size_t& _get_ref_count_nothrow() const noexcept {
             typename std::unordered_map<size_t,size_t>::iterator it = 
                 _ref_count.find(_memory_id);
             return it->second;
         }
 
-        bool& _get_is_deleted_nothrow()
-        const noexcept {
+        bool& _get_is_deleted_nothrow() const noexcept {
             typename std::unordered_map<size_t,bool>::iterator it =
                 _is_deleted.find(_memory_id);
             return it->second;
         }
 
         void _warning(const char* const msg) const {
-            std::cerr << "\033[33m" << "SafePtr warning: " << "\033[0m"
-                << msg << "\n";
+            std::cerr << 
+                "\033[33m" << "SafePtr warning: " << "\033[0m" << msg << "\n";
         }
 
     #endif
