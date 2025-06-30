@@ -99,9 +99,14 @@ public:
         #endif
             #if SAFE_PTR_DEBUG
                 std::lock_guard<std::mutex> lock(_mtx);
-                this->_check_for_usage_after_free();
                 other._check_for_usage_after_free();
                 --_get_ref_count_nothrow();
+                if (
+                    _get_ref_count_nothrow() == 0 &&
+                    !_get_is_deleted_nothrow()
+                ) {
+                    _warning("Memory was leaked.");
+                }
             #endif
             this->_begin = new T[other.size()];
             this->_end = this->_begin + other.size();
@@ -124,9 +129,14 @@ public:
         #endif
             #if SAFE_PTR_DEBUG
                 std::lock_guard<std::mutex> lock(_mtx);
-                this->_check_for_usage_after_free();
                 other._check_for_usage_after_free();
                 --_get_ref_count_nothrow();
+                if (
+                    _get_ref_count_nothrow() == 0 &&
+                    !_get_is_deleted_nothrow()
+                ) {
+                    _warning("Memory was leaked.");
+                }
             #endif
             this->_begin = other._begin;
             this->_end = other._end;
