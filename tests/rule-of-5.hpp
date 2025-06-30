@@ -42,6 +42,7 @@ void test_rule_of_5()
     ASSERT_EQ(ptr9.end(), ptr4.end());
 
     // copy assignment operator
+    ptr2.free();
     ptr2 = ptr6;
     ASSERT_EQ(ptr2[0], ptr6[0]);
     ASSERT_EQ(ptr2[1], ptr6[1]);
@@ -53,6 +54,7 @@ void test_rule_of_5()
 
 
     // move assignment operator
+    ptr1.free();
     ptr1 = std::move(ptr5);
     ASSERT_EQ(ptr1[0], ptr5[0]);
     ASSERT_EQ(ptr1[1], ptr5[1]);
