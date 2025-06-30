@@ -22,28 +22,24 @@ public:
     SafePtr(const size_t& size) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
-        #endif
-        _begin = new T[size];
-        _end = _begin + size;
-        #if SAFE_PTR_DEBUG
             _memory_id = _get_new_memory_id();
             _ref_count[_memory_id] = 1;
             _is_deleted[_memory_id] = false;
         #endif
+        _begin = new T[size];
+        _end = _begin + size;
     }
 
     // constructor
     SafePtr(const std::initializer_list<T>& il) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
-        #endif
-        _begin = new T[il.size()];
-        _end = _begin + il.size();
-        #if SAFE_PTR_DEBUG
             _memory_id = _get_new_memory_id();
             _ref_count[_memory_id] = 1;
             _is_deleted[_memory_id] = false;
         #endif
+        _begin = new T[il.size()];
+        _end = _begin + il.size();
         std::copy(il.begin(), il.end(), this->_begin);
     }
 
@@ -67,14 +63,12 @@ public:
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
             other._check_for_usage_after_free();
-        #endif
-        this->_begin = new T[other.size()];
-        this->_end = this->_begin + other.size();
-        #if SAFE_PTR_DEBUG
             this->_memory_id = _get_new_memory_id();
             _ref_count[this->_memory_id] = 1;
             _is_deleted[this->_memory_id] = false;
         #endif
+        this->_begin = new T[other.size()];
+        this->_end = this->_begin + other.size();
         std::copy(other.begin(), other.end(), this->_begin);
     }
     
@@ -83,13 +77,11 @@ public:
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
             other._check_for_usage_after_free();
-        #endif
-        this->_begin = other._begin;
-        this->_end = other._end;
-        #if SAFE_PTR_DEBUG
             this->_memory_id = other._memory_id;
             ++_get_ref_count_nothrow();
         #endif
+        this->_begin = other._begin;
+        this->_end = other._end;
     }
 
     // copy assignment operator
@@ -97,25 +89,20 @@ public:
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             if (this != &other) {
         #endif
-            #if SAFE_PTR_DEBUG
-                std::lock_guard<std::mutex> lock(_mtx);
-                other._check_for_usage_after_free();
-                --_get_ref_count_nothrow();
-                if (
-                    _get_ref_count_nothrow() == 0 &&
-                    !_get_is_deleted_nothrow()
-                ) {
-                    _warning("Memory was leaked.");
-                }
-            #endif
-            this->_begin = new T[other.size()];
-            this->_end = this->_begin + other.size();
-            #if SAFE_PTR_DEBUG
-                this->_memory_id = _get_new_memory_id();
-                _ref_count[this->_memory_id] = 1;
-                _is_deleted[this->_memory_id] = false;
-            #endif
-            std::copy(other.begin(), other.end(), this->_begin);
+        #if SAFE_PTR_DEBUG
+            std::lock_guard<std::mutex> lock(_mtx);
+            other._check_for_usage_after_free();
+            --_get_ref_count_nothrow();
+            if (_get_ref_count_nothrow()==0 && !_get_is_deleted_nothrow()) {
+                _warning("Memory was leaked.");
+            }
+            this->_memory_id = _get_new_memory_id();
+            _ref_count[this->_memory_id] = 1;
+            _is_deleted[this->_memory_id] = false;
+        #endif
+        this->_begin = new T[other.size()];
+        this->_end = this->_begin + other.size();
+        std::copy(other.begin(), other.end(), this->_begin);
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             }
         #endif
@@ -127,23 +114,18 @@ public:
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             if (this != &other) {
         #endif
-            #if SAFE_PTR_DEBUG
-                std::lock_guard<std::mutex> lock(_mtx);
-                other._check_for_usage_after_free();
-                --_get_ref_count_nothrow();
-                if (
-                    _get_ref_count_nothrow() == 0 &&
-                    !_get_is_deleted_nothrow()
-                ) {
-                    _warning("Memory was leaked.");
-                }
-            #endif
-            this->_begin = other._begin;
-            this->_end = other._end;
-            #if SAFE_PTR_DEBUG
-                this->_memory_id = other._memory_id;
-                ++_get_ref_count_nothrow();
-            #endif
+        #if SAFE_PTR_DEBUG
+            std::lock_guard<std::mutex> lock(_mtx);
+            other._check_for_usage_after_free();
+            --_get_ref_count_nothrow();
+            if (_get_ref_count_nothrow()==0 && !_get_is_deleted_nothrow()) {
+                _warning("Memory was leaked.");
+            }
+            this->_memory_id = other._memory_id;
+            ++_get_ref_count_nothrow();
+        #endif
+        this->_begin = other._begin;
+        this->_end = other._end;
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             }
         #endif
