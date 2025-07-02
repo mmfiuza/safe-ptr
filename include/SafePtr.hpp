@@ -10,6 +10,18 @@
     #include <mutex>
 #endif
 
+#ifndef SAFE_PTR_DEBUG
+    #define SAFE_PTR_DEBUG 0
+#endif
+
+#ifndef SAFE_PTR_TEST
+    #define SAFE_PTR_TEST 0
+#endif
+
+#if SAFE_PTR_TEST
+    struct _SafePtrWarning {};
+#endif
+
 #ifdef SAFE_PTR_NAMESPACE
     namespace SAFE_PTR_NAMESPACE {
 #endif
@@ -327,6 +339,9 @@ private:
         }
 
         void _warning(const char* const msg) const {
+            #if SAFE_PTR_TEST
+                throw _SafePtrWarning();
+            #endif
             std::cerr << 
                 "\033[33m" << "SafePtr warning: " << "\033[0m" << msg << "\n";
         }

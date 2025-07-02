@@ -30,5 +30,17 @@
         expr; \
         std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
             "No exception thrown (line " << __LINE__ << ")\n"; \
-    } catch (...) { \
+    } catch (...) {}
+
+#define ASSERT_WARNS(expr) \
+    try { \
+        expr; \
+        std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
+            "No warning printed (line " << __LINE__ << ")\n"; \
+    } catch (const _SafePtrWarning& e) { \
+        /* test passed */ \
+    } \
+    catch (...) { \
+        std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
+            "No warning printed (line " << __LINE__ << ")\n"; \
     }
