@@ -7,21 +7,20 @@
 void test_rule_of_5()
 {
     // regular constructors //
-    SafePtr<double> ptr0(0);
-    SafePtr<double> ptr1(5);
-    SafePtr<double> ptr2(5);
-    const SafePtr<double> ptr3 = {1.0, 1.2, 1.5};
-    std::initializer_list<double> il1 = {1.5, 7.3, 9.7, 1.4}; 
-    SafePtr<double> ptr4 = il1;
-    const std::initializer_list<double> il2 = {1.4, 1.4, 8.7, 5.3}; 
-    SafePtr<double> ptr5 = il2;
-    std::initializer_list<double> il3 = {9.9, 1.7, 6.7, 8.4}; 
-    const SafePtr<double> ptr6 = il3;
-
-
+    SafePtr<double> ptr12(0);
+    ptr12.free();
+    SafePtr<double> ptr11(6);
+    ptr11.free();
+    SafePtr<double> ptr3 = {1.0, 1.2, 1.5};
+    ptr3.free();
+    
     // copy constructor //
+    SafePtr<double> ptr0(0);
     auto ptr7 = ptr0;
-    const SafePtr<double> ptr8 = ptr4;
+    ptr0.free();
+    ptr7.free();
+    SafePtr<double> ptr4 = {1.5, 7.3, 9.7, 1.4};
+    auto ptr8 = ptr4;
     ASSERT_EQ(ptr8[0], ptr4[0]);
     ASSERT_EQ(ptr8[1], ptr4[1]);
     ASSERT_EQ(ptr8[2], ptr4[2]);
@@ -29,19 +28,27 @@ void test_rule_of_5()
     ASSERT_DIFF(ptr8.data(), ptr4.data());
     ASSERT_DIFF(ptr8.begin(), ptr4.begin());
     ASSERT_DIFF(ptr8.end(), ptr4.end());
-
+    ptr4.free();
+    ptr8.free();
     
     // move constructor //
-    const SafePtr<double> ptr9 = std::move(ptr4);
-    ASSERT_EQ(ptr9[0], ptr4[0]);
-    ASSERT_EQ(ptr9[1], ptr4[1]);
-    ASSERT_EQ(ptr9[2], ptr4[2]);
-    ASSERT_EQ(ptr9[3], ptr4[3]);
-    ASSERT_EQ(ptr9.data(), ptr4.data());
-    ASSERT_EQ(ptr9.begin(), ptr4.begin());
-    ASSERT_EQ(ptr9.end(), ptr4.end());
-
+    SafePtr<double> ptr10 = {0.3, 4.7, 9.2, 3.4};
+    SafePtr<double> ptr9 = std::move(ptr10);
+    ASSERT_EQ(ptr9[0], ptr10[0]);
+    ASSERT_EQ(ptr9[1], ptr10[1]);
+    ASSERT_EQ(ptr9[2], ptr10[2]);
+    ASSERT_EQ(ptr9[3], ptr10[3]);
+    ASSERT_EQ(ptr9.data(), ptr10.data());
+    ASSERT_EQ(ptr9.begin(), ptr10.begin());
+    ASSERT_EQ(ptr9.end(), ptr10.end());
+    ptr9.free();
+    #if SAFE_PTR_DEBUG
+        ASSERT_THROWS(ptr10.free());
+    #endif
+    
     // copy assignment operator
+    SafePtr<double> ptr2(5);
+    SafePtr<double> ptr6 = {9.9, 1.7, 6.7, 8.4};
     ptr2.free();
     ptr2 = ptr6;
     ASSERT_EQ(ptr2[0], ptr6[0]);
@@ -51,9 +58,12 @@ void test_rule_of_5()
     ASSERT_DIFF(ptr2.data(), ptr6.data());
     ASSERT_DIFF(ptr2.begin(), ptr6.begin());
     ASSERT_DIFF(ptr2.end(), ptr6.end());
-
-
+    ptr2.free();
+    ptr6.free();
+    
     // move assignment operator
+    SafePtr<double> ptr1(5);
+    SafePtr<double> ptr5 = {1.4, 1.4, 8.7, 5.3};
     ptr1.free();
     ptr1 = std::move(ptr5);
     ASSERT_EQ(ptr1[0], ptr5[0]);
@@ -63,21 +73,8 @@ void test_rule_of_5()
     ASSERT_EQ(ptr1.data(), ptr5.data());
     ASSERT_EQ(ptr1.begin(), ptr5.begin());
     ASSERT_EQ(ptr1.end(), ptr5.end());
-
-
-    // free memory //
-    ptr0.free();
     ptr1.free();
-    ptr2.free();
-    ptr3.free();
-    ptr4.free();
     #if SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr5.free());
-    #endif
-    ptr6.free();
-    ptr7.free();
-    ptr8.free();
-    #if SAFE_PTR_DEBUG
-        ASSERT_THROWS(ptr9.free());
     #endif
 }
