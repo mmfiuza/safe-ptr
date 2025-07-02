@@ -36,6 +36,20 @@ void test_methods()
     ASSERT_EQ(ptr1[1], 2);
     ASSERT_EQ(ptr1[2], 2);
     ASSERT_EQ(ptr1[3], 2);
+    ptr0.free();
+    ptr1.free();
+    #if SAFE_PTR_DEBUG
+        ASSERT_WARNS(ptr1.size());
+        ASSERT_WARNS(ptr1[0]);
+        ASSERT_WARNS(ptr1.at(0));
+        ASSERT_WARNS(ptr1.empty());
+        ASSERT_WARNS(ptr1.data());
+        ASSERT_WARNS(ptr1.front());
+        ASSERT_WARNS(ptr1.back());
+        ASSERT_WARNS(ptr1.begin());
+        ASSERT_WARNS(ptr1.end());
+        ASSERT_WARNS(ptr1.fill(0));
+    #endif
     
     // const
     const SafePtr<int> ptr2(0);
@@ -63,10 +77,17 @@ void test_methods()
     for (const auto& p : ptr3) {
         x = p;
     }
-
-    // free memory
-    ptr0.free();
-    ptr1.free();
     ptr2.free();
     ptr3.free();
+    #if SAFE_PTR_DEBUG
+        ASSERT_WARNS(ptr2.size());
+        ASSERT_WARNS(ptr2[0]);
+        ASSERT_WARNS(ptr2.at(0));
+        ASSERT_WARNS(ptr2.empty());
+        ASSERT_WARNS(ptr2.data());
+        ASSERT_WARNS(ptr2.front());
+        ASSERT_WARNS(ptr2.back());
+        ASSERT_WARNS(ptr2.begin());
+        ASSERT_WARNS(ptr2.end());
+    #endif
 }

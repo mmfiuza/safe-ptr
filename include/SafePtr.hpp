@@ -85,7 +85,7 @@ public:
     }
     
     // move constructor
-    SafePtr(SafePtr&& other) noexcept(!SAFE_PTR_DEBUG) {
+    SafePtr(SafePtr&& other) noexcept(!SAFE_PTR_DEBUG && !SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
             other._check_for_usage_after_free();
@@ -122,7 +122,8 @@ public:
     }
 
     // move assignment operator
-    SafePtr& operator=(SafePtr&& other) noexcept(!SAFE_PTR_DEBUG) {
+    SafePtr& operator=(SafePtr&& other)
+    noexcept(!SAFE_PTR_DEBUG && !SAFE_PTR_TEST) {
         #ifndef SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
             if (this != &other) {
         #endif
@@ -144,7 +145,7 @@ public:
         return *this;
     }
 
-    void free() const noexcept(!SAFE_PTR_DEBUG) {
+    void free() const noexcept(!SAFE_PTR_DEBUG && !SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             std::lock_guard<std::mutex> lock(_mtx);
             if(_get_is_deleted_nothrow() == true) {
@@ -157,47 +158,47 @@ public:
         delete[] _begin;
     }
 
-    size_t size() const noexcept {
+    size_t size() const noexcept(!SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             _check_for_usage_after_free();
         #endif
         return _end - _begin;
     }
 
-    const T* begin() const noexcept {
+    const T* begin() const noexcept(!SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             _check_for_usage_after_free();
         #endif
         return _begin;
     }
 
-    T* begin() noexcept {
+    T* begin() noexcept(!SAFE_PTR_TEST) {
         return const_cast<T*>(
             const_cast<const SafePtr<T>&>(*this).begin()
         );
     }
 
-    const T* end() const noexcept {
+    const T* end() const noexcept(!SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             _check_for_usage_after_free();
         #endif
         return _end;
     }
 
-    T* end() noexcept {
+    T* end() noexcept(!SAFE_PTR_TEST) {
         return const_cast<T*>(
             const_cast<const SafePtr<T>&>(*this).end()
         );
     }
 
-    const T& operator[](const size_t& index) const noexcept {
+    const T& operator[](const size_t& index) const noexcept(!SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             _check_for_usage_after_free();
         #endif
         return *(_begin + index);
     }
 
-    T& operator[](const size_t& index) noexcept {
+    T& operator[](const size_t& index) noexcept(!SAFE_PTR_TEST) {
         return const_cast<T&>(
             const_cast<const SafePtr<T>&>(*this)[index]
         );
@@ -221,47 +222,47 @@ public:
         );
     }
 
-    bool empty() const noexcept {
+    bool empty() const noexcept(!SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             _check_for_usage_after_free();
         #endif
         return this->size() == 0;
     }
 
-    const T* data() const noexcept {
+    const T* data() const noexcept(!SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             _check_for_usage_after_free();
         #endif
         return _begin;
     }
 
-    T* data() noexcept {
+    T* data() noexcept(!SAFE_PTR_TEST) {
         return const_cast<T*>(
             const_cast<const SafePtr<T>&>(*this).data()
         );
     }
 
-    const T& front() const noexcept {
+    const T& front() const noexcept(!SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             _check_for_usage_after_free();
         #endif
         return *(this->_begin);
     }
 
-    T& front() noexcept {
+    T& front() noexcept(!SAFE_PTR_TEST) {
         return const_cast<T&> (
             const_cast<const SafePtr<T>&>(*this).front()
         );
     }
 
-    const T& back() const noexcept {
+    const T& back() const noexcept(!SAFE_PTR_TEST) {
         #if SAFE_PTR_DEBUG
             _check_for_usage_after_free();
         #endif
         return *(this->_end-1);
     }
 
-    T& back() noexcept {
+    T& back() noexcept(!SAFE_PTR_TEST) {
         return const_cast<T&>(
             const_cast<const SafePtr<T>&>(*this).back()
         );
@@ -320,7 +321,7 @@ private:
             }
         }
 
-        void _check_for_usage_after_free() const noexcept {
+        void _check_for_usage_after_free() const noexcept(!SAFE_PTR_TEST) {
             if (_get_is_deleted_nothrow() == true) {
                 _warning("Tried to access data after free() was called.");
             }

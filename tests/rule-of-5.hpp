@@ -52,7 +52,7 @@ void test_rule_of_5()
     // copy assignment operator
     SafePtr<double> ptr2(5);
     SafePtr<double> ptr6 = {9.9, 1.7, 6.7, 8.4};
-    #if SAFE_PTFR_TEST
+    #if SAFE_PTR_DEBUG
         ASSERT_WARNS(ptr2 = ptr6);
     #endif
     ptr2.free();
@@ -70,7 +70,7 @@ void test_rule_of_5()
     // move assignment operator
     SafePtr<double> ptr1(5);
     SafePtr<double> ptr5 = {1.4, 1.4, 8.7, 5.3};
-    #if SAFE_PTFR_TEST
+    #if SAFE_PTR_DEBUG
         ASSERT_WARNS(ptr1 = std::move(ptr5));
     #endif
     ptr1.free();

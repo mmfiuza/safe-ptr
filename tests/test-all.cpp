@@ -2,7 +2,9 @@
 
 #define SAFE_PTR_DEBUG 1
 #define SAFE_PTR_TEST 1
+#define TEST_PRINT 0
 #include "SafePtr.hpp"
+
 #include "rule-of-5.hpp"
 #include "methods.hpp"
 #include "ref-count.hpp"
@@ -13,7 +15,9 @@ int main()
     test_rule_of_5();
     test_methods();
     test_ref_count();
-    // test_print();
+    #if TEST_PRINT
+        test_print();
+    #endif
 
     std::cout << "Test finished\n";
 }

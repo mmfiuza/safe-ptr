@@ -42,5 +42,4 @@ void test_ref_count()
         t1[i].join();
     }  
     b.free();
-
 }
