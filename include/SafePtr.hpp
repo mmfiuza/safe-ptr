@@ -320,7 +320,7 @@ private:
                 return _next_available_memory_id;
             }
             while (true) { // handle overflow
-                if (!_ref_count.contains(_next_available_memory_id)) {
+                if (_ref_count.count(_next_available_memory_id) == 0) {
                     return _next_available_memory_id;
                 }
                 ++_next_available_memory_id;
@@ -353,7 +353,6 @@ private:
             std::cerr << 
                 "\033[33m" << "SafePtr warning: " << "\033[0m" << msg << "\n";
         }
-
     #endif
 };
 
