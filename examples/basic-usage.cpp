@@ -2,9 +2,8 @@
 
 #include <iostream>
 
-#define SAFE_PTR_DEBUG 1
+#define SAFE_PTR_DEBUG
 #define SAFE_PTR_NAMESPACE foo
-// #define SAFE_PTR_DISABLE_SELF_ASSIGNING_CHECKING
 #include "SafePtr.hpp"
 
 int main()

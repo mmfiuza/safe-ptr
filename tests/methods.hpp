@@ -19,7 +19,7 @@ void test_methods()
     ASSERT_EQ(ptr1.at(1), 3);
     ASSERT_EQ(ptr1.at(2), 2);
     ASSERT_EQ(ptr1.at(3), 1);
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr1.at(4));
     #endif
     ASSERT_EQ(ptr0.empty(), true);
@@ -38,7 +38,7 @@ void test_methods()
     ASSERT_EQ(ptr1[3], 2);
     ptr0.free();
     ptr1.free();
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_WARNS(ptr1.size());
         ASSERT_WARNS(ptr1[0]);
         ASSERT_WARNS(ptr1.at(0));
@@ -64,7 +64,7 @@ void test_methods()
     ASSERT_EQ(ptr3.at(1), 3);
     ASSERT_EQ(ptr3.at(2), 2);
     ASSERT_EQ(ptr3.at(3), 1);
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr3.at(4));
     #endif
     ASSERT_EQ(ptr2.empty(), true);
@@ -79,7 +79,7 @@ void test_methods()
     }
     ptr2.free();
     ptr3.free();
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_WARNS(ptr2.size());
         ASSERT_WARNS(ptr2[0]);
         ASSERT_WARNS(ptr2.at(0));

@@ -9,7 +9,7 @@ void test_rule_of_5()
     // regular constructors //
     SafePtr<double> ptr12(0);
     ptr12.free();
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr12.free());
     #endif
     SafePtr<double> ptr11(6);
@@ -45,14 +45,14 @@ void test_rule_of_5()
     ASSERT_EQ(ptr9.begin(), ptr10.begin());
     ASSERT_EQ(ptr9.end(), ptr10.end());
     ptr9.free();
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr10.free());
     #endif
     
     // copy assignment operator
     SafePtr<double> ptr2(5);
     SafePtr<double> ptr6 = {9.9, 1.7, 6.7, 8.4};
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_WARNS(ptr2 = ptr6);
     #endif
     ptr2.free();
@@ -70,7 +70,7 @@ void test_rule_of_5()
     // move assignment operator
     SafePtr<double> ptr1(5);
     SafePtr<double> ptr5 = {1.4, 1.4, 8.7, 5.3};
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_WARNS(ptr1 = std::move(ptr5));
     #endif
     ptr1.free();
@@ -83,7 +83,7 @@ void test_rule_of_5()
     ASSERT_EQ(ptr1.begin(), ptr5.begin());
     ASSERT_EQ(ptr1.end(), ptr5.end());
     ptr1.free();
-    #if SAFE_PTR_DEBUG
+    #ifdef SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr5.free());
     #endif
 }
