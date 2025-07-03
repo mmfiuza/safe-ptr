@@ -1,6 +1,6 @@
 # SafePtr
 
-![Static Badge](https://img.shields.io/badge/C%2B%2B_version-11_or_above-blue?logo=c%2B%2B)
+![Static Badge](https://img.shields.io/badge/C%2B%2B_standard-11_or_above-blue?logo=c%2B%2B)
 
 SafePtr is a C++ container type for memory control and safety. It can store any type you need in a contiguous fixed size heap allocated segment. Below, there is an example of usage.
 ```c++
