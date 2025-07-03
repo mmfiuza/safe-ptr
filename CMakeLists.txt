@@ -1,8 +1,8 @@
 # Copyright (c) 2025 Matheus Machado Fiuza <matheusmachadofiuza@gmail.com>
 
-cmake_minimum_required(VERSION 3.5) # TODO: check the minimum required
+cmake_minimum_required(VERSION 3.5)
 project(SafePtr LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 20) # TODO: check the minimum required 
+set(CMAKE_CXX_STANDARD 11)
 
 # examples
 set(EXAMPLE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/examples/basic-usage.cpp)
