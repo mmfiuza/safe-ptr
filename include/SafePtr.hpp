@@ -290,11 +290,13 @@ public:
         #endif
         std::cout << variable_name << ": {\n";
         if (!this->empty()) {
+            size_t idx = 0;
             for (const auto& t : *this) {
-                std::cout << "    " << t << ",\n";
+                std::cout << "    " << idx << ": " << t << ",\n";
+                ++idx;
             }
             std::cout << "\033[A" << "\033[2K"; // move to line above and clear
-            std::cout << "    " << this->back() << "\n";
+            std::cout << "    " << idx-1 << ": " << this->back() << "\n";
         }
         std::cout << "}\n";
     }

@@ -167,7 +167,6 @@ cmake --build build && \
 ## To do:
 - test id overflow
 - search for a solution to make initializer_list not copy
-- add index to print
 - add better examples
 - improve cmake
 - add find()
