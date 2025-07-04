@@ -73,11 +73,11 @@ SafePtr has the following methods:
 A SafePtr can be constructed by passing the number of elements or a `std::initializer_list`.
 ```c++
 SafePtr<int> a(5);
-std::cout << a.size(); << "\n" // prints 5
+std::cout << a.size() << "\n"; // prints 5
 a.free();
 
 SafePtr<int> b = {1, 2, 3};
-std::cout << a[0] << "," << a[1] << "," << a[2] << "\n" // prints 1,2,3
+std::cout << a[0] << "," << a[1] << "," << a[2] << "\n"; // prints 1,2,3
 b.free();
 ```
 
@@ -172,4 +172,6 @@ cmake --build build && \
 - add find()
 - add contains()
 - add print()
+- add swap
+- check if cbegin and cend is needed
 -->
