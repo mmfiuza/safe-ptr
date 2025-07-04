@@ -54,19 +54,22 @@ Also, SafePtr throws exceptions when:
 
 ## Methods
 
-SafePtr has the following methods:
-- `free()`: frees the memory pointed by a SafePtr;
-- `size()`: returns the number of elements a SafePtr is storing;
-- `begin()`: returns a raw pointer to the first stored element;
-- `end()`: returns a raw pointer to the byte after the last byte of the last element stored (**not** the last element);
-- `operator[idx]`: allows access to read or write data to the element in the `idx` index **without** bounds checking;
-- `at(idx)`: allows access to read or write data to the element in the `idx` index **with** bounds checking;
-- `empty()`: returns `true` if the number of elements is zero and `false` if not;
-- `data()`: returns a raw pointer to the first stored element;
-- `front()`: returns a reference to the first element;
-- `back()`: returns a reference to the last element;
-- `fill(value)`: assigns `value` to all the stored elements;
-- `print_all(name)`: prints all the elements if the stored type is printable with `std::cout` (`name` is an optional string).
+SafePtr has the following methods.
+- `free()`: Frees the memory pointed by a SafePtr.
+- `size()`: Returns the number of elements a SafePtr is storing.
+- `begin()`: Returns a raw pointer to the first stored element.
+- `cbegin()`: The same as `begin`, but returns `const`.
+- `end()`: Returns a raw pointer to the byte after the last byte of the last element stored (**not** the last element).
+- `cend()`: The same as `end`, but returns `const`.
+- `operator[idx]`: Returns a reference to the element with the `idx` index **without** bounds checking.
+- `at(idx)`: Returns a reference to the element with the `idx` index **with** bounds checking.
+- `empty()`: Returns `true` if the number of elements is zero and `false` if not.
+- `data()`: Returns a raw pointer to the first stored element.
+- `front()`: Returns a reference to the first element.
+- `back()`: Returns a reference to the last element.
+- `fill(value)`: Assigns `value` to all the stored elements.
+- `print(label)`: Prints the elements. `label` is an optional string. The stored type must be printable with `std::cout`. For large `size`, might not print all elements.
+- `print_all(label)`: The same as `print`, but always prints **all** elements.
 
 ## Constructor
 
