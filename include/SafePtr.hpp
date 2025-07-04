@@ -183,6 +183,14 @@ public:
         );
     }
 
+    const T* cbegin() const noexcept(!SAFE_PTR_TEST_BOOL) {
+        return begin();
+    }
+
+    const T* cbegin() noexcept(!SAFE_PTR_TEST_BOOL) {
+        return const_cast<const SafePtr<T>&>(*this).cbegin();
+    }
+
     const T* end() const noexcept(!SAFE_PTR_TEST_BOOL) {
         #if SAFE_PTR_DEBUG_BOOL
             _check_for_usage_after_free();
@@ -194,6 +202,15 @@ public:
         return const_cast<T*>(
             const_cast<const SafePtr<T>&>(*this).end()
         );
+    }
+
+    const T* cend() const noexcept(!SAFE_PTR_TEST_BOOL) {
+        return end();
+    }
+
+    const T* cend() noexcept(!SAFE_PTR_TEST_BOOL) {
+        return const_cast<const SafePtr<T>&>(*this).cend();
+        
     }
 
     const T& operator[](const size_t& index)

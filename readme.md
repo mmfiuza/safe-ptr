@@ -172,5 +172,4 @@ cmake --build build && \
 - add contains()
 - add print()
 - add swap
-- check if cbegin and cend is needed
 -->

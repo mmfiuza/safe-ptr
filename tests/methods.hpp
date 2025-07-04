@@ -22,6 +22,8 @@ void test_methods()
     #ifdef SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr1.at(4));
     #endif
+    ASSERT_EQ(ptr1.cbegin(), ptr1.begin());
+    ASSERT_EQ(ptr1.cend(), ptr1.end());
     ASSERT_EQ(ptr0.empty(), true);
     ASSERT_EQ(ptr1.empty(), false);
     ASSERT_EQ(ptr1.data(), ptr1.begin());
@@ -42,6 +44,8 @@ void test_methods()
         ASSERT_WARNS(ptr1.size());
         ASSERT_WARNS(ptr1[0]);
         ASSERT_WARNS(ptr1.at(0));
+        ASSERT_WARNS(ptr1.cbegin());
+        ASSERT_WARNS(ptr1.cend());
         ASSERT_WARNS(ptr1.empty());
         ASSERT_WARNS(ptr1.data());
         ASSERT_WARNS(ptr1.front());
@@ -67,6 +71,8 @@ void test_methods()
     #ifdef SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr3.at(4));
     #endif
+    ASSERT_EQ(ptr3.cbegin(), ptr3.begin());
+    ASSERT_EQ(ptr3.cend(), ptr3.end());
     ASSERT_EQ(ptr2.empty(), true);
     ASSERT_EQ(ptr3.empty(), false);
     ASSERT_EQ(ptr3.data(), ptr3.begin());
@@ -83,6 +89,8 @@ void test_methods()
         ASSERT_WARNS(ptr2.size());
         ASSERT_WARNS(ptr2[0]);
         ASSERT_WARNS(ptr2.at(0));
+        ASSERT_WARNS(ptr3.cbegin());
+        ASSERT_WARNS(ptr3.cend());
         ASSERT_WARNS(ptr2.empty());
         ASSERT_WARNS(ptr2.data());
         ASSERT_WARNS(ptr2.front());
