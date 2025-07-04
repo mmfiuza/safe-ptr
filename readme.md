@@ -129,7 +129,7 @@ If any memory leak happens during these kind of operations due to mistakes, warn
 
 SafePtr is a header-only library, having only **one** source file: [`include/SafePtr.hpp`](./include/SafePtr.hpp). So, if you want to use it, you just need to have this file anywhere in your machine and them set your compile include path to find it while compiling your code. Below, there is an example using [GCC](https://gcc.gnu.org/).
 ```
-g++ -o my_program -I path/to/SafePtr/dir/include/ my_code.cpp
+g++ -o my_program -I path/to/SafePtr/include/ my_code.cpp
 ```
 
 SafePtr is a **lightweight** library, having only the SafePtr class defined. Because of that, the library is **not** defined inside any namespace, since naming conflicts would be extremely unlikely. However, if you want to have SafePtr defined in some namespace, you can use the `SAFE_PTR_NAMESPACE` macro like below.
@@ -148,7 +148,7 @@ int main() {
 Go to the root directory of the repository and run:
 ```
 rm -rf build && \
-cmake -S . -B build && \
+cmake -S . -B build -DBUILD_EXAMPLES=ON && \
 cmake --build build && \
 ./build/basic-usage
 ```
@@ -158,7 +158,7 @@ cmake --build build && \
 Go to the root directory of the repository and run:
 ```
 rm -rf build && \
-cmake -S . -B build && \
+cmake -S . -B build -DBUILD_TESTS=ON && \
 cmake --build build && \
 ./build/test-all
 ```
@@ -168,7 +168,6 @@ cmake --build build && \
 - test id overflow
 - search for a solution to make initializer_list not copy
 - add better examples
-- improve cmake
 - add find()
 - add contains()
 - add print()
