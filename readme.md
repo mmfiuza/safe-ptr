@@ -170,6 +170,5 @@ cmake --build build && \
 - add better examples
 - add find()
 - add contains()
-- add print()
 - add swap
 -->

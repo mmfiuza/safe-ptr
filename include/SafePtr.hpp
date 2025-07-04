@@ -313,8 +313,38 @@ public:
                 ++idx;
             }
             std::cout << "\033[A" << "\033[2K"; // move to line above and clear
-            std::cout << "    " << idx-1 << ": " << this->back() << "\n";
+            std::cout << "    " << idx-1 << ": " << back() << "\n";
         }
+        std::cout << "}\n";
+    }
+
+    void print(const char* const variable_name = "SafePtr::print") const {
+        #if SAFE_PTR_DEBUG_BOOL
+            _check_for_usage_after_free();
+        #endif
+
+        constexpr size_t MAX_ELEMENTS_TO_PRINT = 26;
+        if (size() <= MAX_ELEMENTS_TO_PRINT) {
+            print_all(variable_name);
+            return;
+        }
+        
+        constexpr size_t ELEMENTS_BEFORE_DOTS = 13;
+        constexpr size_t ELEMENTS_AFTER_DOTS = 12;
+        std::cout << variable_name << ": {\n";
+        size_t idx = 0;
+        for (const T* it=cbegin(); it!=cbegin()+ELEMENTS_BEFORE_DOTS; ++it) {
+            std::cout << "    " << idx << ": " << *it << ",\n";
+            ++idx;
+        }
+        idx = size() - ELEMENTS_AFTER_DOTS;
+        std::cout << "    ...\n";
+        for (const T* it=cend()-ELEMENTS_AFTER_DOTS; it!=cend(); ++it) {
+            std::cout << "    " << idx << ": " << *it << ",\n";
+            ++idx;
+        }
+        std::cout << "\033[A" << "\033[2K"; // move to line above and clear
+        std::cout << "    " << idx-1 << ": " << back() << "\n";
         std::cout << "}\n";
     }
 
