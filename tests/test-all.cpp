@@ -13,12 +13,17 @@
 
 int main()
 {
-    test_rule_of_5();
-    test_methods();
-    test_ref_count();
-    #if TEST_PRINT
-        test_print();
-    #endif
+    try {
+        test_rule_of_5();
+        test_methods();
+        test_ref_count();
+        #if TEST_PRINT
+            test_print();
+        #endif
+    } catch (const _SafePtrWarning& e) {
+        std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET <<
+            "An unexpected warning was triggered\n";
+    }
 
     std::cout << "Test finished\n";
 }
