@@ -16,6 +16,9 @@ void test_rule_of_5()
     ptr11.free();
     SafePtr<double> ptr3 = {1.0, 1.2, 1.5};
     ptr3.free();
+    SafePtr<double> ptr13;
+    ptr13 = SafePtr<double>(4);
+    ptr13.free();
     
     // copy constructor //
     SafePtr<double> ptr0(0);
