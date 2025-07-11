@@ -130,7 +130,7 @@ If any memory leak happens during these kind of operations due to mistakes, warn
 
 ## How to install
 
-SafePtr is a header-only library, having only **one** source file: [`include/SafePtr.hpp`](./include/SafePtr.hpp). So, if you want to use it, you just need to have this file anywhere in your machine and them set your compile include path to find it while compiling your code. Below, there is an example using [GCC](https://gcc.gnu.org/).
+SafePtr is a header-only library, having only **one** source file: [`include/SafePtr.hpp`](./include/SafePtr.hpp). So, if you want to use it, you just need to have this file anywhere in your machine and then set your compiler include path to find it while compiling your code. Below, there is an example using [GCC](https://gcc.gnu.org/).
 ```
 g++ -o my_program -I path/to/SafePtr/include/ my_code.cpp
 ```
@@ -169,7 +169,7 @@ cmake --build build && \
 <!--
 ## To do:
 - test id overflow
-- search for a solution to make initializer_list not copy
+- add recursive print method
 - add better examples
 - add find()
 - add contains()
