@@ -30,7 +30,8 @@ void test_print()
         p = i;
         ++i;
     }
-    ptr4.print("ptr4");
+    ptr4.print("ptr4 print()");
+    ptr4.print_all("ptr4 print_all()");
 
     // free memory
     ptr0.free();
