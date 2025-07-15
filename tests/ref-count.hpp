@@ -10,7 +10,7 @@ void test_ref_count()
 {
     size_t thread_count = 1000;
 
-    SafePtr<float> a = {1,2,3,4}; 
+    fz::SafePtr<float> a = {1,2,3,4}; 
     std::vector<std::thread> t0;
     for (size_t i=0; i!=thread_count; ++i) {
         t0.push_back(std::thread([&](){
@@ -23,12 +23,12 @@ void test_ref_count()
     a.free();
     
     
-    SafePtr<float> b = {1,2,3,4};
+    fz::SafePtr<float> b = {1,2,3,4};
     std::vector<std::thread> t1;
     for (size_t i=0; i!=thread_count; ++i) {
         t1.push_back(std::thread([&](){
-            SafePtr<float> x = {5,4,3,2,1};
-            SafePtr<float> y = {7,8,9};
+            fz::SafePtr<float> x = {5,4,3,2,1};
+            fz::SafePtr<float> y = {7,8,9};
             x.free();
             x = b;
             x.free();

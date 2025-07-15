@@ -7,25 +7,25 @@
 void test_rule_of_5()
 {
     // regular constructors //
-    SafePtr<double> ptr12(0);
+    fz::SafePtr<double> ptr12(0);
     ptr12.free();
     #ifdef SAFE_PTR_DEBUG
         ASSERT_THROWS(ptr12.free());
     #endif
-    SafePtr<double> ptr11(6);
+    fz::SafePtr<double> ptr11(6);
     ptr11.free();
-    SafePtr<double> ptr3 = {1.0, 1.2, 1.5};
+    fz::SafePtr<double> ptr3 = {1.0, 1.2, 1.5};
     ptr3.free();
-    SafePtr<double> ptr13;
-    ptr13 = SafePtr<double>(4);
+    fz::SafePtr<double> ptr13;
+    ptr13 = fz::SafePtr<double>(4);
     ptr13.free();
     
     // copy constructor //
-    SafePtr<double> ptr0(0);
+    fz::SafePtr<double> ptr0(0);
     auto ptr7 = ptr0;
     ptr0.free();
     ptr7.free();
-    SafePtr<double> ptr4 = {1.5, 7.3, 9.7, 1.4};
+    fz::SafePtr<double> ptr4 = {1.5, 7.3, 9.7, 1.4};
     auto ptr8 = ptr4;
     ASSERT_EQ(ptr8[0], ptr4[0]);
     ASSERT_EQ(ptr8[1], ptr4[1]);
@@ -38,8 +38,8 @@ void test_rule_of_5()
     ptr8.free();
     
     // move constructor //
-    SafePtr<double> ptr10 = {0.3, 4.7, 9.2, 3.4};
-    SafePtr<double> ptr9 = std::move(ptr10);
+    fz::SafePtr<double> ptr10 = {0.3, 4.7, 9.2, 3.4};
+    fz::SafePtr<double> ptr9 = std::move(ptr10);
     ASSERT_EQ(ptr9[0], ptr10[0]);
     ASSERT_EQ(ptr9[1], ptr10[1]);
     ASSERT_EQ(ptr9[2], ptr10[2]);
@@ -53,8 +53,8 @@ void test_rule_of_5()
     #endif
     
     // copy assignment operator
-    SafePtr<double> ptr2(5);
-    SafePtr<double> ptr6 = {9.9, 1.7, 6.7, 8.4};
+    fz::SafePtr<double> ptr2(5);
+    fz::SafePtr<double> ptr6 = {9.9, 1.7, 6.7, 8.4};
     #ifdef SAFE_PTR_DEBUG
         ASSERT_WARNS(ptr2 = ptr6);
     #endif
@@ -71,8 +71,8 @@ void test_rule_of_5()
     ptr6.free();
     
     // move assignment operator
-    SafePtr<double> ptr1(5);
-    SafePtr<double> ptr5 = {1.4, 1.4, 8.7, 5.3};
+    fz::SafePtr<double> ptr1(5);
+    fz::SafePtr<double> ptr5 = {1.4, 1.4, 8.7, 5.3};
     #ifdef SAFE_PTR_DEBUG
         ASSERT_WARNS(ptr1 = std::move(ptr5));
     #endif

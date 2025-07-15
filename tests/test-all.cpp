@@ -20,7 +20,7 @@ int main()
         #if TEST_PRINT
             test_print();
         #endif
-    } catch (const _SafePtrWarning& e) {
+    } catch (const fz::_SafePtrWarning& e) {
         std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET <<
             "An unexpected warning was triggered\n";
     }

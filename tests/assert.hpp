@@ -37,7 +37,7 @@
         expr; \
         std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
             "No warning printed (line " << __LINE__ << ")\n"; \
-    } catch (const _SafePtrWarning& e) { \
+    } catch (const fz::_SafePtrWarning& e) { \
         /* test passed */ \
     } catch (...) { \
         std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \

@@ -3,20 +3,19 @@
 #include <iostream>
 
 #define SAFE_PTR_DEBUG
-#define SAFE_PTR_NAMESPACE foo
 #include "SafePtr.hpp"
 
 int main()
 {
-    foo::SafePtr<int> ptr1(5);
+    fz::SafePtr<int> ptr1(5);
     int i = 0;
     for (auto& s : ptr1) {
         s = i;
         i += 2;
     }
-    const foo::SafePtr<float> ptr2 = {1.0, 1.2, 1.5};
-    foo::SafePtr<float> ptr3(0);
-    foo::SafePtr<int> ptr4(5);
+    const fz::SafePtr<float> ptr2 = {1.0, 1.2, 1.5};
+    fz::SafePtr<float> ptr3(0);
+    fz::SafePtr<int> ptr4(5);
     ptr4.fill(9);
     
     ptr1.print_all();

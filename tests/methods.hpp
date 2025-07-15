@@ -7,8 +7,8 @@
 void test_methods()
 {
     // non const
-    SafePtr<int> ptr0(0);
-    SafePtr<int> ptr1 = {4,3,2,1};
+    fz::SafePtr<int> ptr0(0);
+    fz::SafePtr<int> ptr1 = {4,3,2,1};
     ASSERT_EQ(ptr1.size(), 4);
     ASSERT_EQ(ptr1.size(), 4);
     ASSERT_EQ(ptr1[0], 4);
@@ -56,8 +56,8 @@ void test_methods()
     #endif
     
     // const
-    const SafePtr<int> ptr2(0);
-    const SafePtr<int> ptr3 = {4,3,2,1};
+    const fz::SafePtr<int> ptr2(0);
+    const fz::SafePtr<int> ptr3 = {4,3,2,1};
     ASSERT_EQ(ptr3.size(), 4);
     ASSERT_EQ(ptr3.size(), 4);
     ASSERT_EQ(ptr3[0], 4);
