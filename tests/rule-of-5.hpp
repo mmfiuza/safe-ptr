@@ -26,6 +26,11 @@ void test_rule_of_5()
     ASSERT_EQ(ptr14[2], ptr15[2]);
     ptr14.free();
     ptr15.free();
+    fz::SafePtr<double> ptr16(3, 7);
+    ASSERT_EQ(ptr16[0], 7);
+    ASSERT_EQ(ptr16[1], 7);
+    ASSERT_EQ(ptr16[2], 7);
+    ptr16.free();
     
     // copy constructor //
     fz::SafePtr<double> ptr0(0);

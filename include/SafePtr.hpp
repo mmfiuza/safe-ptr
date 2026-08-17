@@ -57,6 +57,19 @@ public:
     }
 
     // constructor
+    SafePtr(const size_t& size, const T value) {
+        #if SAFE_PTR_DEBUG_BOOL
+            std::lock_guard<std::mutex> lock(_mtx);
+            _memory_id = _get_new_memory_id();
+            _ref_count[_memory_id] = 1;
+            _is_deleted[_memory_id] = false;
+        #endif
+        _begin = new T[size];
+        _end = _begin + size;
+        fill(value);
+    }
+
+    // constructor
     SafePtr(const std::initializer_list<T>& il) {
         #if SAFE_PTR_DEBUG_BOOL
             std::lock_guard<std::mutex> lock(_mtx);
