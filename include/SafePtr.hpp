@@ -45,7 +45,7 @@ public:
     }
 
     // constructor
-    SafePtr(const size_t& size) {
+    SafePtr(const size_t size) {
         #if SAFE_PTR_DEBUG_BOOL
             std::lock_guard<std::mutex> lock(_mtx);
             _memory_id = _get_new_memory_id();
@@ -57,7 +57,7 @@ public:
     }
 
     // constructor
-    SafePtr(const size_t& size, const T value) {
+    SafePtr(const size_t size, const T value) {
         #if SAFE_PTR_DEBUG_BOOL
             std::lock_guard<std::mutex> lock(_mtx);
             _memory_id = _get_new_memory_id();
@@ -250,20 +250,20 @@ public:
         return const_cast<const SafePtr<T>&>(*this).cend();
     }
 
-    const T& operator[](const size_t& index) const {
+    const T& operator[](const size_t index) const {
         #if SAFE_PTR_DEBUG_BOOL
             _check_for_use_after_free();
         #endif
         return *(_begin + index);
     }
 
-    T& operator[](const size_t& index) {
+    T& operator[](const size_t index) {
         return const_cast<T&>(
             const_cast<const SafePtr<T>&>(*this)[index]
         );
     }
 
-    const T& at(const size_t& index) const {
+    const T& at(const size_t index) const {
         #if SAFE_PTR_DEBUG_BOOL
             _check_for_use_after_free();
         #endif
@@ -275,7 +275,7 @@ public:
         return *(_begin + index);
     }
 
-    T& at(const size_t& index) {
+    T& at(const size_t index) {
         return const_cast<T&>(
             const_cast<const SafePtr<T>&>(*this).at(index)
         );
