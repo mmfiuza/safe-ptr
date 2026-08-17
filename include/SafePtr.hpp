@@ -100,7 +100,7 @@ public:
     }
 
     // destructor
-    ~SafePtr() noexcept {
+    ~SafePtr() noexcept(!SAFE_PTR_TEST_BOOL) {
         #if SAFE_PTR_DEBUG_BOOL
             std::lock_guard<std::mutex> lock(_mtx);
             --_get_ref_count();
@@ -248,7 +248,6 @@ public:
 
     const T* cend() {
         return const_cast<const SafePtr<T>&>(*this).cend();
-        
     }
 
     const T& operator[](const size_t& index) const {
