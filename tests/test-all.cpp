@@ -21,9 +21,12 @@ int main()
             test_print();
         #endif
     } catch (const fz::_SafePtrWarning& e) {
-        std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET <<
+        std::cerr << COLOR_RED << "TEST FAILED: " << COLOR_RESET <<
             "An unexpected warning was triggered\n";
+    } catch (...) {
+        std::cerr << COLOR_RED << "TEST FAILED: " << COLOR_RESET <<
+            "Unexpected exception thrown\n";
     }
 
-    std::cout << "Test finished\n";
+    std::cout << COLOR_GREEN << "Test passed" << COLOR_RESET << "\n";
 }

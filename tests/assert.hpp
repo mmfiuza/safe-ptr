@@ -3,6 +3,7 @@
 # pragma once
 
 #define COLOR_RED "\033[31m"
+#define COLOR_GREEN "\033[32m"
 #define COLOR_RESET "\033[0m"
 
 #define ASSERT_TRUE(expr) \
@@ -38,7 +39,7 @@
         std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
             "No warning printed (line " << __LINE__ << ")\n"; \
     } catch (const fz::_SafePtrWarning& e) { \
-        /* test passed */ \
+        /* assert passed */ \
     } catch (...) { \
         std::cerr << COLOR_RED << "FAILED TEST: " << COLOR_RESET << \
             "No warning printed (line " << __LINE__ << ")\n"; \
