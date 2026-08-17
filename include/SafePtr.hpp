@@ -17,6 +17,8 @@
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
+#include <iterator>
+#include <type_traits>
 #if SAFE_PTR_DEBUG_BOOL
     #include <unordered_map>
     #include <mutex>
@@ -65,6 +67,23 @@ public:
         _begin = new T[il.size()];
         _end = _begin + il.size();
         std::copy(il.begin(), il.end(), this->_begin);
+    }
+
+    // constructor
+    template<
+        typename InputIt,
+        typename std::enable_if<
+            !std::is_integral<InputIt>::value, int
+        >::type = 0
+    >
+    SafePtr(InputIt first, InputIt last) {
+        #if SAFE_PTR_DEBUG_BOOL
+            std::lock_guard<std::mutex> lock(_mtx);
+            _memory_id = _get_new_memory_id();
+            _ref_count[_memory_id] = 1;
+            _is_deleted[_memory_id] = false;
+        #endif
+        _construct_from_range(first, last, _sp_has_subtraction<InputIt>{});
     }
 
     // destructor
@@ -356,7 +375,48 @@ public:
 
 private:
     T* _begin; // points to the first element
-    T* _end;   // points to the byte after the last byte of the element
+    T* _end;   // points to the byte after the last byte of the last element
+
+    // C++11-compatible replacement for std::void_t (which is C++17)
+    template<typename...>
+    struct _sp_void { using type = void; };
+    template<typename... Ts>
+    using _sp_void_t = typename _sp_void<Ts...>::type;
+
+    // Detects whether subtracting the iterators to get the size is valid.
+    template<typename It, typename = void>
+    struct _sp_has_subtraction : std::false_type {};
+
+    template<typename It>
+    struct _sp_has_subtraction<
+        It,
+        _sp_void_t<decltype(std::declval<It>() - std::declval<It>())>
+    > : std::true_type {};
+
+    // Allocates memory by subtracting the iterators to get the size (faster).
+    template<typename InputIt>
+    void _construct_from_range(
+        InputIt first, InputIt last, std::true_type
+    ) {
+        const size_t n = static_cast<size_t>(last - first);
+        _begin = new T[n];
+        _end = _begin + n;
+        std::copy(first, last, _begin);
+    }
+
+    // Allocates memory by iterating along the range to count size (slower).
+    template<typename InputIt>
+    void _construct_from_range(
+        InputIt first, InputIt last, std::false_type
+    ) {
+        size_t n = 0;
+        for (InputIt it = first; it != last; ++it) {
+            ++n;
+        }
+        _begin = new T[n];
+        _end = _begin + n;
+        std::copy(first, last, _begin);
+    }
 
     #if SAFE_PTR_DEBUG_BOOL
         size_t _memory_id;

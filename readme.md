@@ -73,15 +73,20 @@ Also, `fz::SafePtr` throws exceptions when:
 
 ## Constructor
 
-A `fz::SafePtr` can be constructed by passing the number of elements or a `std::initializer_list`.
+A `fz::SafePtr` can be constructed by passing the number of elements, a `std::initializer_list` or a range constructor from iterators.
 ```c++
-fz::SafePtr<int> a(5);
+fz::SafePtr<int> a(5); // the elements are uninitialized
 std::cout << a.size() << "\n"; // prints 5
 a.free();
 
 fz::SafePtr<int> b = {1, 2, 3};
 std::cout << b[0] << "," << b[1] << "," << b[2] << "\n"; // prints 1 2 3
 b.free();
+
+std::vector<int> vec = {1, 2, 3};
+fz::SafePtr<int> c(vec.begin(), vec.end());
+std::cout << c[0] << "," << c[1] << "," << c[2] << "\n"; // prints 1 2 3
+c.free();
 ```
 
 ## Copying and moving
