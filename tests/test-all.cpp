@@ -20,6 +20,7 @@ int main()
         #if TEST_PRINT
             test_print();
         #endif
+        std::cout << COLOR_GREEN << "Test passed" << COLOR_RESET << "\n";
     } catch (const fz::_SafePtrWarning& e) {
         std::cerr << COLOR_RED << "TEST FAILED: " << COLOR_RESET <<
             "An unexpected warning was triggered\n";
@@ -27,6 +28,4 @@ int main()
         std::cerr << COLOR_RED << "TEST FAILED: " << COLOR_RESET <<
             "Unexpected exception thrown\n";
     }
-
-    std::cout << COLOR_GREEN << "Test passed" << COLOR_RESET << "\n";
 }
