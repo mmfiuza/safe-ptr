@@ -137,6 +137,18 @@ a.free(); // freeing "b" instead also works
 
 If any memory leak happens during these kind of operations due to mistakes, warnings will be printed.
 
+## Using `fz::SafePtr` views
+
+`fz::SafePtr` can be used as a view, to access data from any other container that allocates memory contiguously. In the example below, `vec_view` is a `fz::SafePtr<int>` that can read and write data from `vec`.
+```c++
+std::vector<int> vec = {1, 2, 3};
+auto vec_view = fz::SafePtr<int>::make_view(vec.data(), vec.size());
+vec_view.print(); // prints 1 2 3
+```
+This allows using the functionalities of `fz::SafePtr` in data from other container types (or `fz::SafePtr` itself) while avoiding copying that data.
+
+However, when using views, it is not the job of the `fz::SafePtr` instance to allocate or free memory. That task must be done by the actual owner of the data. Also, a `fz::SafePtr` view can lead to access of invalid memory if not used carefully, without any warning or error message in `SAFE_PTR_DEBUG` mode.
+
 ## How to install
 
 `fz::SafePtr` is a header-only library, having only **one** source file: [`include/SafePtr.hpp`](./include/SafePtr.hpp). So, if you want to use it, you just need to have this file anywhere in your machine and then set your compiler include path to find it while compiling your code. Below, there is an example using [GCC](https://gcc.gnu.org/).

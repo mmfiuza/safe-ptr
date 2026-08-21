@@ -103,6 +103,9 @@ public:
     ~SafePtr() noexcept(!SAFE_PTR_TEST_BOOL) {
         #if SAFE_PTR_DEBUG_BOOL
             std::lock_guard<std::mutex> lock(_mtx);
+            if (_get_is_view()) {
+                return;
+            }
             --_get_ref_count();
             if (_get_ref_count() == 0) {
                 if(!_get_is_deleted()) {
@@ -134,7 +137,9 @@ public:
             std::lock_guard<std::mutex> lock(_mtx);
             other._check_for_use_after_free();
             this->_memory_id = other._memory_id;
-            ++_get_ref_count();
+            if (!_get_is_view()) {
+                ++_get_ref_count();
+            }
         #endif
         this->_begin = other._begin;
         this->_end = other._end;
@@ -148,9 +153,11 @@ public:
         #if SAFE_PTR_DEBUG_BOOL
             std::lock_guard<std::mutex> lock(_mtx);
             other._check_for_use_after_free();
-            --_get_ref_count();
-            if (_get_ref_count()==0 && !_get_is_deleted()) {
-                _warning("Memory was leaked.");
+            if (!_get_is_view()) {
+                --_get_ref_count();
+                if (_get_ref_count()==0 && !_get_is_deleted()) {
+                    _warning("Memory was leaked.");
+                }
             }
             this->_memory_id = _get_new_memory_id();
             _ref_count[this->_memory_id] = 1;
@@ -173,12 +180,16 @@ public:
         #if SAFE_PTR_DEBUG_BOOL
             std::lock_guard<std::mutex> lock(_mtx);
             other._check_for_use_after_free();
-            --_get_ref_count();
-            if (_get_ref_count()==0 && !_get_is_deleted()) {
-                _warning("Memory was leaked.");
+            if (!_get_is_view()) {
+                --_get_ref_count();
+                if (_get_ref_count()==0 && !_get_is_deleted()) {
+                    _warning("Memory was leaked.");
+                }
             }
             this->_memory_id = other._memory_id;
-            ++_get_ref_count();
+            if (!_get_is_view()) {
+                ++_get_ref_count();
+            }
         #endif
         this->_begin = other._begin;
         this->_end = other._end;
@@ -191,14 +202,30 @@ public:
     void free() const {
         #if SAFE_PTR_DEBUG_BOOL
             std::lock_guard<std::mutex> lock(_mtx);
-            if(_get_is_deleted() == true) {
+            if (_get_is_deleted()) {
                 throw std::logic_error(
                     "it was tried to free the same memory pointer twice"
+                );
+            }
+            if (_get_is_view()) {
+                throw std::logic_error(
+                    "it was tried to free the memory of a view"
                 );
             }
             _get_is_deleted() = true;
         #endif
         delete[] _begin;
+    }
+
+    static SafePtr<T> make_view(T* const data, const size_t size) {
+        SafePtr<T> safe_ptr;
+        #if SAFE_PTR_DEBUG_BOOL
+            std::lock_guard<std::mutex> lock(_mtx);
+            safe_ptr._memory_id = 0;
+        #endif
+        safe_ptr._begin = data;
+        safe_ptr._end = data + size;
+        return safe_ptr;
     }
 
     size_t size() const {
@@ -428,7 +455,7 @@ private:
     }
 
     #if SAFE_PTR_DEBUG_BOOL
-        size_t _memory_id;
+        size_t _memory_id; // 0 is for if the ptr is a view
         static size_t _next_available_memory_id;
         static std::unordered_map<size_t,size_t> _ref_count;
         static std::unordered_map<size_t,bool> _is_deleted;
@@ -457,6 +484,10 @@ private:
             }
         }
 
+        bool _get_is_view() const {
+            return _memory_id == 0;
+        }
+
         size_t& _get_ref_count() const {
             return _ref_count.at(_memory_id);
         }
@@ -476,15 +507,24 @@ private:
 };
 
 #if SAFE_PTR_DEBUG_BOOL
-    template<typename T> size_t SafePtr<T>::_next_available_memory_id = 0;
+    template<typename T>
+    size_t SafePtr<T>::_next_available_memory_id = 1;
 
     template<typename T>
     std::unordered_map<size_t,size_t> SafePtr<T>::_ref_count;
+
+    template <typename T>
+    std::unordered_map<size_t, bool> SafePtr<T>::_is_deleted = [] {
+        std::unordered_map<size_t, bool> m;
+        m[0] = false;
+        return m;
+    }();
+
     template<typename T>
-    std::unordered_map<size_t,bool> SafePtr<T>::_is_deleted;
-    template<typename T> bool SafePtr<T>::_id_overflow_occurred = false;
+    bool SafePtr<T>::_id_overflow_occurred = false;
     
-    template<typename T> std::mutex SafePtr<T>::_mtx;
+    template<typename T>
+    std::mutex SafePtr<T>::_mtx;
 #endif
 
 } // namespace fz

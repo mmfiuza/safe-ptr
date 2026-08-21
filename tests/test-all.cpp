@@ -5,6 +5,7 @@
 #include "SafePtr.hpp"
 
 #include "rule-of-5.hpp"
+#include "view.hpp"
 #include "methods.hpp"
 #include "ref-count.hpp"
 #include "print.hpp"
@@ -15,6 +16,7 @@ int main()
 {
     try {
         test_rule_of_5();
+        test_view();
         test_methods();
         test_ref_count();
         #if TEST_PRINT
