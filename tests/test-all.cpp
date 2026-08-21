@@ -1,6 +1,5 @@
 // Copyright (c) 2025 Matheus Machado Fiuza <matheusmachadofiuza@gmail.com>
 
-#define SAFE_PTR_DEBUG
 #define SAFE_PTR_TEST
 #include "SafePtr.hpp"
 
@@ -14,6 +13,12 @@
 
 int main()
 {
+    std::cout << "========================================\n";
+    #ifdef SAFE_PTR_DEBUG
+        std::cout << "Testing with SAFE_PTR_DEBUG mode ON:\n";
+    #else
+        std::cout << "Testing with SAFE_PTR_DEBUG mode OFF:\n";
+    #endif
     try {
         test_rule_of_5();
         test_view();
