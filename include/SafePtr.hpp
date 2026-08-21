@@ -14,6 +14,8 @@
     #define SAFE_PTR_TEST_BOOL 0
 #endif
 
+#define SAFE_PTR_WARNING(msg) _warning(msg, __FILE__, __LINE__, __func__)
+
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
@@ -109,7 +111,7 @@ public:
             --_get_ref_count();
             if (_get_ref_count() == 0) {
                 if(!_get_is_deleted()) {
-                    _warning("Memory was leaked.");
+                    SAFE_PTR_WARNING("Memory was leaked.");
                 }
                 _ref_count.erase(_memory_id);
                 _is_deleted.erase(_memory_id);
@@ -156,7 +158,7 @@ public:
             if (!_get_is_view()) {
                 --_get_ref_count();
                 if (_get_ref_count()==0 && !_get_is_deleted()) {
-                    _warning("Memory was leaked.");
+                    SAFE_PTR_WARNING("Memory was leaked.");
                 }
             }
             this->_memory_id = _get_new_memory_id();
@@ -183,7 +185,7 @@ public:
             if (!_get_is_view()) {
                 --_get_ref_count();
                 if (_get_ref_count()==0 && !_get_is_deleted()) {
-                    _warning("Memory was leaked.");
+                    SAFE_PTR_WARNING("Memory was leaked.");
                 }
             }
             this->_memory_id = other._memory_id;
@@ -204,7 +206,8 @@ public:
             std::lock_guard<std::mutex> lock(_mtx);
             if (_get_is_deleted()) {
                 throw std::logic_error(
-                    "it was tried to free the same memory pointer twice"
+                    "it was tried to free the memory of a SafePtr that does "
+                    "not own data."
                 );
             }
             if (_get_is_view()) {
@@ -480,7 +483,9 @@ private:
 
         void _check_for_use_after_free() const noexcept(!SAFE_PTR_TEST_BOOL) {
             if (_get_is_deleted() == true) {
-                _warning("Tried to access data after free() was called.");
+                SAFE_PTR_WARNING(
+                    "Tried to access data after free() was called."
+                );
             }
         }
 
@@ -496,12 +501,19 @@ private:
             return _is_deleted.at(_memory_id);
         }
 
-        void _warning(const char* const msg) const {
-            #if SAFE_PTR_TEST_BOOL
-                throw _SafePtrWarning();
-            #endif
-            std::cerr << 
-                "\033[33m" << "SafePtr warning: " << "\033[0m" << msg << "\n";
+        void _warning(
+            const char* const msg,
+            const char* const file,
+            int line,
+            const char* const func
+        ) const {
+        #if SAFE_PTR_TEST_BOOL
+            throw _SafePtrWarning();
+        #endif
+            std::cerr << "\033[33m"
+                    << "SafePtr warning at " << file << ":" << line
+                    << " in function " << func << ": "
+                    << "\033[0m" << msg << "\n";
         }
     #endif
 };
